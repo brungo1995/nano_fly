@@ -1,14 +1,6 @@
-// Client ID and API key from the Developer Console
-// var CLIENT_ID = '304030376995-peok82ttae46jmdvqra62jv4agaaa4e9.apps.googleusercontent.com';
-// var API_KEY = 'AIzaSyD52L7GpxR5QoOrX0PtPIQf-XGJPKSzwL8';
-
-// brungo1995 Account
-// var CLIENT_ID = '304030376995-2kt3cvphngb0q4ujjg8bn89o5rugs3ic.apps.googleusercontent.com';
-// var API_KEY = 'AIzaSyD52L7GpxR5QoOrX0PtPIQf-XGJPKSzwL8';
 
 // nanosoft Account
 var CLIENT_ID = '268533544506-b9ebe7rme4t6c99jbksi03gb3fc5iu7h.apps.googleusercontent.com';
-// var API_KEY = '<AOI_KEY>';
 var API_KEY = 'AIzaSyBbwCP7WsVophZAYHOH2oVw3pqUY9Xzklw';
 
 
@@ -23,12 +15,17 @@ var SCOPES = 'https://www.googleapis.com/auth/drive';
 
 var authorizeButton = document.getElementById('authorize_button');
 var signoutButton = document.getElementById('signout_button');
+
+// Folders
 var listFoldersButton = document.getElementById('list_folders');
 var clearButton = document.getElementById('clear');
 var createFolderButton = document.getElementById('create_folder');
 var deleteFolderButton = document.getElementById('delete_folder');
-// var createFileButton = document.getElementById('create_file');
+
+//Files
+var createFileButton = document.getElementById('create_file');
 var listFilesButton = document.getElementById('list_files');
+var getFileButton = document.getElementById('get_file');
 
 /**
  *  On load, called to load the auth2 library and API client library.
@@ -65,7 +62,8 @@ function initClient() {
         deleteFolderButton.onclick = handleDeleteFolder;
 
         // File handlers
-        // createFileButton.onclick = handleCreateSpreadsheet;
+        createFileButton.onclick = handleCreateSpreadsheet;
+        getFileButton.onclick = handleGetSpreadsheet;
 
     }, function (error) {
         appendPre(JSON.stringify(error, null, 2));
@@ -80,13 +78,13 @@ function updateSigninStatus(isSignedIn) {
     if (isSignedIn) {
         authorizeButton.style.display = 'none';
         signoutButton.style.display = 'block';
-        authorizeButton.style.display = 'block';
-        signoutButton.style.display = 'block';
+
         listFoldersButton.style.display = 'block';
         clearButton.style.display = 'block';
         createFolderButton.style.display = 'block';
         deleteFolderButton.style.display = 'block';
-        //  createFileButton = document.getElementById('create_file');
+        createFileButton.style.display = 'block';
+        getFileButton.style.display = 'block';
         listFilesButton.style.display = 'block';
         document.getElementById("folder_name").style.display = 'block';
 
@@ -96,12 +94,14 @@ function updateSigninStatus(isSignedIn) {
     } else {
         authorizeButton.style.display = 'block';
         signoutButton.style.display = 'none';
+
         listFoldersButton.style.display = 'none';
         clearButton.style.display = 'none';
         createFolderButton.style.display = 'none';
         deleteFolderButton.style.display = 'none';
-        //  createFileButton = document.getElementById('create_file');
+        createFileButton.style.display = 'block';
         listFilesButton.style.display = 'none';
+        getFileButton.style.display = 'block';
         document.getElementById("folder_name").style.display = 'none';
 
     }
@@ -180,6 +180,7 @@ function listFiles() {
  * CREATE FOLDER
  */
 function handleCreateFolder() {
+    handleClear()
     const folderName = document.getElementById("folder_name").value
     gapi.client.request({
         path: "https://www.googleapis.com/drive/v3/files",
@@ -190,6 +191,7 @@ function handleCreateFolder() {
         }
     }).then(function (response) {
         appendPre('Created Folder:');
+        handleListFolders();
         var files = response.result.files;
         if (files && files.length > 0) {
             for (var i = 0; i < files.length; i++) {
@@ -207,6 +209,7 @@ function handleCreateFolder() {
  * DELETE FOLDER
  */
 function handleDeleteFolder() {
+    handleClear()
     const folderName = document.getElementById("folder_name").value
 
     gapi.client.request({
@@ -224,6 +227,7 @@ function handleDeleteFolder() {
  * LIST FOLDERS
  */
 function handleListFolders() {
+    handleClear()
     gapi.client.request({
         path: "https://www.googleapis.com/drive/v3/files?q=mimeType: 'application/vnd.google-apps.folder'",
     }).then(function (response) {
@@ -255,20 +259,27 @@ function handleListFolders() {
     // });
 }
 
+
 /**
  * CREATE SPREADSHEET
  */
 function handleGetSpreadsheet() {
+    handleClear()
     let docName = document.getElementById("spreadsheet_name").value;
 
+    // console.log(docName)
     gapi.client.request({
         path: `https://sheets.googleapis.com/v4/spreadsheets/${docName}`,
         method: "GET",
     }).then(function (response) {
-        appendPre('Spreadsheets:');
-        var files = response.result.files;
-        console.log("CREATE SPREADSHEETS RES: ")
-        console.log(response);
+        var title = response.result.properties.title;
+        var id = response.result.spreadsheetId;
+        appendPre(`${title} (${id})`);
+
+        // appendPre('Spreadsheets:');
+        // var files = response.result.files;
+        // console.log("CREATE SPREADSHEETS RES: ")
+        console.log(title, id);
         // list files
     });
 }
@@ -277,19 +288,25 @@ function handleGetSpreadsheet() {
  * GET SPREADSHEET
  */
 function handleCreateSpreadsheet() {
+    handleClear()
     let docName = document.getElementById("spreadsheet_name").value
     gapi.client.request({
         path: "https://sheets.googleapis.com/v4/spreadsheets",
         method: "post",
         body: {
-            name: docName,
+            properties: {
+                title: `${docName}`
+            },
         }
     }).then(function (response) {
-        appendPre('Spreadsheets:');
-        var files = response.result.files;
+        appendPre('Spreadsheet Created ');
         console.log("CREATE SPREADSHEETS RES: ")
         console.log(response);
-        // list files
+        var title = response.result.properties.title;
+        var id = response.result.spreadsheetId;
+
+        appendPre(`${title} (${id})`);
+
     });
 }
 
