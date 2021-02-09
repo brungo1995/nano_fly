@@ -27,6 +27,7 @@ var createFileButton = document.getElementById('create_file');
 var listFilesButton = document.getElementById('list_files');
 var getFileButton = document.getElementById('get_file');
 var listSpreadsheetsFilesButton = document.getElementById('list_spread_files');
+var deleteSpreadsheetsFilesButton = document.getElementById('delete_spread_file');
 
 /**
  *  On load, called to load the auth2 library and API client library.
@@ -66,6 +67,7 @@ function initClient() {
         createFileButton.onclick = handleCreateSpreadsheet;
         getFileButton.onclick = handleGetSpreadsheet;
         listSpreadsheetsFilesButton.onclick = handleListSpreadFiles;
+        deleteSpreadsheetsFilesButton.onclick = handleDeleteSpreadFile;
 
     }, function (error) {
         appendPre(JSON.stringify(error, null, 2));
@@ -284,10 +286,11 @@ function handleCreateSpreadsheet() {
  * LIST ALL SPREAD FILES
  */
 function handleListSpreadFiles() {
-    handleClear()
+
     gapi.client.request({
         path: "https://www.googleapis.com/drive/v3/files?q=mimeType: 'application/vnd.google-apps.spreadsheet'",
     }).then(function (response) {
+        handleClear()
         appendPre('Spreadsheets:');
         var files = response.result.files;
         if (files && files.length > 0) {
@@ -303,6 +306,24 @@ function handleListSpreadFiles() {
 
 
 
+}
+
+
+/**
+ * DELETE SPREADSHEET
+ */
+function handleDeleteSpreadFile() {
+    handleClear()
+    let docName = document.getElementById("spreadsheet_name").value
+
+    gapi.client.request({
+        path: `https://www.googleapis.com/drive/v3/files/${docName}`,
+        method: "delete"
+    }).then(function (response) {
+        console.log(response)
+        appendPre('DELETED File:');
+        handleListSpreadFiles();
+    });
 }
 
 
