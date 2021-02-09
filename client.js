@@ -16,10 +16,8 @@ var API_KEY = 'AIzaSyBbwCP7WsVophZAYHOH2oVw3pqUY9Xzklw';
 var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
 
 // Authorization scopes required by the API; multiple scopes can be
-// included, separated by spaces.
 // var SCOPES = 'https://www.googleapis.com/auth/drive.file';
 var SCOPES = 'https://www.googleapis.com/auth/drive';
-// var SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly';
 // var SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly';
 
 
@@ -82,12 +80,30 @@ function updateSigninStatus(isSignedIn) {
     if (isSignedIn) {
         authorizeButton.style.display = 'none';
         signoutButton.style.display = 'block';
+        authorizeButton.style.display = 'block';
+        signoutButton.style.display = 'block';
+        listFoldersButton.style.display = 'block';
+        clearButton.style.display = 'block';
+        createFolderButton.style.display = 'block';
+        deleteFolderButton.style.display = 'block';
+        //  createFileButton = document.getElementById('create_file');
+        listFilesButton.style.display = 'block';
+        document.getElementById("folder_name").style.display = 'block';
+
         // listFiles();
         appendPre("SIGNED IN")
         // appendPre("SIGNED IN ! YEY!!")
     } else {
         authorizeButton.style.display = 'block';
         signoutButton.style.display = 'none';
+        listFoldersButton.style.display = 'none';
+        clearButton.style.display = 'none';
+        createFolderButton.style.display = 'none';
+        deleteFolderButton.style.display = 'none';
+        //  createFileButton = document.getElementById('create_file');
+        listFilesButton.style.display = 'none';
+        document.getElementById("folder_name").style.display = 'none';
+
     }
 }
 
