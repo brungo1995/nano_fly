@@ -8,8 +8,8 @@
 
 // nanosoft Account
 var CLIENT_ID = '268533544506-b9ebe7rme4t6c99jbksi03gb3fc5iu7h.apps.googleusercontent.com';
-var API_KEY = '<AOI_KEY>';
-// var API_KEY = 'AIzaSyBbwCP7WsVophZAYHOH2oVw3pqUY9Xzklw';
+// var API_KEY = '<AOI_KEY>';
+var API_KEY = 'AIzaSyBbwCP7WsVophZAYHOH2oVw3pqUY9Xzklw';
 
 
 // Array of API discovery doc URLs for APIs used by the quickstart
