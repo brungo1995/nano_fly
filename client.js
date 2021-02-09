@@ -1,8 +1,14 @@
 // Client ID and API key from the Developer Console
 // var CLIENT_ID = '304030376995-peok82ttae46jmdvqra62jv4agaaa4e9.apps.googleusercontent.com';
 // var API_KEY = 'AIzaSyD52L7GpxR5QoOrX0PtPIQf-XGJPKSzwL8';
-var CLIENT_ID = '304030376995-2kt3cvphngb0q4ujjg8bn89o5rugs3ic.apps.googleusercontent.com';
-var API_KEY = 'AIzaSyD52L7GpxR5QoOrX0PtPIQf-XGJPKSzwL8';
+
+// brungo1995 Account
+// var CLIENT_ID = '304030376995-2kt3cvphngb0q4ujjg8bn89o5rugs3ic.apps.googleusercontent.com';
+// var API_KEY = 'AIzaSyD52L7GpxR5QoOrX0PtPIQf-XGJPKSzwL8';
+
+// nanosoft Account
+var CLIENT_ID = '268533544506-b9ebe7rme4t6c99jbksi03gb3fc5iu7h.apps.googleusercontent.com';
+var API_KEY = 'AIzaSyBbwCP7WsVophZAYHOH2oVw3pqUY9Xzklw';
 
 
 // Array of API discovery doc URLs for APIs used by the quickstart
