@@ -134,7 +134,6 @@ function listFiles() {
             appendPre('No files found.');
         }
     });
-
     // gapi.client.drive.files.list({
     //     'pageSize': 10,
     //     'fields': "nextPageToken, files(id, name)"
