@@ -29,7 +29,7 @@ var listFoldersButton = document.getElementById('list_folders');
 var clearButton = document.getElementById('clear');
 var createFolderButton = document.getElementById('create_folder');
 var deleteFolderButton = document.getElementById('delete_folder');
-var createFileButton = document.getElementById('create_file');
+// var createFileButton = document.getElementById('create_file');
 var listFilesButton = document.getElementById('list_files');
 
 /**
@@ -67,7 +67,7 @@ function initClient() {
         deleteFolderButton.onclick = handleDeleteFolder;
 
         // File handlers
-        createFileButton.onclick = handleCreateSpreadsheet;
+        // createFileButton.onclick = handleCreateSpreadsheet;
 
     }, function (error) {
         appendPre(JSON.stringify(error, null, 2));
