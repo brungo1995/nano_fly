@@ -26,6 +26,7 @@ var deleteFolderButton = document.getElementById('delete_folder');
 var createFileButton = document.getElementById('create_file');
 var listFilesButton = document.getElementById('list_files');
 var getFileButton = document.getElementById('get_file');
+var listSpreadsheetsFilesButton = document.getElementById('list_spread_files');
 
 /**
  *  On load, called to load the auth2 library and API client library.
@@ -64,6 +65,7 @@ function initClient() {
         // File handlers
         createFileButton.onclick = handleCreateSpreadsheet;
         getFileButton.onclick = handleGetSpreadsheet;
+        listSpreadsheetsFilesButton.onclick = handleListSpreadFiles;
 
     }, function (error) {
         appendPre(JSON.stringify(error, null, 2));
@@ -142,6 +144,7 @@ function handleClear() {
  * Print files.
  */
 function listFiles() {
+    handleClear()
     gapi.client.request({
         path: "https://www.googleapis.com/drive/v3/files",
         method: "GET",
@@ -157,21 +160,6 @@ function listFiles() {
             appendPre('No files found.');
         }
     });
-    // gapi.client.drive.files.list({
-    //     'pageSize': 10,
-    //     'fields': "nextPageToken, files(id, name)"
-    // }).then(function (response) {
-    //     appendPre('Files:');
-    //     var files = response.result.files;
-    //     if (files && files.length > 0) {
-    //         for (var i = 0; i < files.length; i++) {
-    //             var file = files[i];
-    //             appendPre(file.name + ' (' + file.id + ')');
-    //         }
-    //     } else {
-    //         appendPre('No files found.');
-    //     }
-    // });
 
 
 }
@@ -242,21 +230,7 @@ function handleListFolders() {
             appendPre('No Folders found.');
         }
     });
-    // gapi.client.drive.files.list({
-    //     'pageSize': 10,
-    //     'fields': "nextPageToken, files(id, name)"
-    // }).then(function (response) {
-    //     appendPre('Files:');
-    //     var files = response.result.files;
-    //     if (files && files.length > 0) {
-    //         for (var i = 0; i < files.length; i++) {
-    //             var file = files[i];
-    //             appendPre(file.name + ' (' + file.id + ')');
-    //         }
-    //     } else {
-    //         appendPre('No files found.');
-    //     }
-    // });
+
 }
 
 
@@ -267,7 +241,7 @@ function handleGetSpreadsheet() {
     handleClear()
     let docName = document.getElementById("spreadsheet_name").value;
 
-    // console.log(docName)
+    console.log(docName)
     gapi.client.request({
         path: `https://sheets.googleapis.com/v4/spreadsheets/${docName}`,
         method: "GET",
@@ -275,12 +249,7 @@ function handleGetSpreadsheet() {
         var title = response.result.properties.title;
         var id = response.result.spreadsheetId;
         appendPre(`${title} (${id})`);
-
-        // appendPre('Spreadsheets:');
-        // var files = response.result.files;
-        // console.log("CREATE SPREADSHEETS RES: ")
         console.log(title, id);
-        // list files
     });
 }
 
@@ -310,6 +279,31 @@ function handleCreateSpreadsheet() {
     });
 }
 
+
+/**
+ * LIST ALL SPREAD FILES
+ */
+function handleListSpreadFiles() {
+    handleClear()
+    gapi.client.request({
+        path: "https://www.googleapis.com/drive/v3/files?q=mimeType: 'application/vnd.google-apps.spreadsheet'",
+    }).then(function (response) {
+        appendPre('Spreadsheets:');
+        var files = response.result.files;
+        if (files && files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                appendPre(file.name + ' (' + file.id + ')');
+            }
+        } else {
+            appendPre('No Spreadsheets found.');
+        }
+    });
+
+
+
+
+}
 
 
 // gapi.client.request({
