@@ -4,14 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Google App1</title>
+    <style>
+        .container {
+            display: flex;
+            max-width: 500px;
+            justify-content: space-evenly;
+        }
+
+        .form_col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form_col .item {
+            margin-top: 5px;
+        }
+    </style>
 </head>
 
 <body>
     <p>Drive API Quickstart by Edvaldo</p>
     <!--Add buttons to initiate auth sequence and sign out-->
-    <button id="authorize_button" style="display: none;">Authorize</button>
-    <button id="signout_button" style="display: none;">Sign Out</button>
+    <div class="container">
+
+        <!-- Authorization -->
+        <div class="form_col">
+            <h3 for="">Authorization</h3>
+            <button id="authorize_button" style="display: none;">Authorize</button>
+            <button id="signout_button" style="display: none;">Sign Out</button>
+            <!-- <button id="list_files" class="item">List all Files</button> -->
+
+        </div>
+
+        <!-- Folders -->
+        <div class="form_col">
+            <h3 for="">Folders</h3>
+            <label for="folder_name"></label>
+            <input type="text" name="folder_name" id="folder_name" placeholder="Folder name">
+            <button id="create_folder" class="item">Create</button>
+            <button id="list_folders" class="item">List all folders</button>
+            <button id="delete_folder" class="item">Delete</button>
+        </div>
+
+        <!-- Sheets -->
+        <div class="form_col">
+            <!-- <h3 for="">Spreadsheets</h3> -->
+            <!-- <label for="spreadsheet_name"></label> -->
+            <!-- <input type="text" name="spreadsheet_name" id="spreadsheet_name" placeholder="Spreadsheet Name"> -->
+            <!-- <button id="create_file" class="item">Create</button> -->
+
+        </div>
+    </div>
+
     <pre id="content" style="white-space: pre-wrap;"></pre>
+    <button id="clear" class="item">Clear</button>
     <script src="client.js"></script>
     <script async defer src="https://apis.google.com/js/api.js" onload="this.onload=function(){};handleClientLoad()"
         onreadystatechange="if (this.readyState === 'complete') this.onload()">

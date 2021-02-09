@@ -10,20 +10,14 @@ var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/res
 
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
-// var SCOPES = 'https://www.googleapis.com/auth/drive.file';
-var SCOPES = 'https://www.googleapis.com/auth/drive';
+var SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly';
 // var SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly';
-// var SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly';
-
 
 var authorizeButton = document.getElementById('authorize_button');
 var signoutButton = document.getElementById('signout_button');
 var listFoldersButton = document.getElementById('list_folders');
 var clearButton = document.getElementById('clear');
 var createFolderButton = document.getElementById('create_folder');
-var deleteFolderButton = document.getElementById('delete_folder');
-var createFileButton = document.getElementById('create_file');
-var listFilesButton = document.getElementById('list_files');
 
 /**
  *  On load, called to load the auth2 library and API client library.
@@ -50,18 +44,12 @@ function initClient() {
         updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
         authorizeButton.onclick = handleAuthClick;
         signoutButton.onclick = handleSignoutClick;
-        listFilesButton.onclick = listFiles;
 
 
         // Register folder handlers
         listFoldersButton.onclick = handleListFolders;
         clearButton.onclick = handleClear;
         createFolderButton.onclick = handleCreateFolder;
-        deleteFolderButton.onclick = handleDeleteFolder;
-
-        // File handlers
-        createFileButton.onclick = handleCreateSpreadsheet;
-
     }, function (error) {
         appendPre(JSON.stringify(error, null, 2));
     });
@@ -76,8 +64,7 @@ function updateSigninStatus(isSignedIn) {
         authorizeButton.style.display = 'none';
         signoutButton.style.display = 'block';
         // listFiles();
-        appendPre("SIGNED IN")
-        // appendPre("SIGNED IN ! YEY!!")
+        appendPre("SIGNED IN ! YEY!!")
     } else {
         authorizeButton.style.display = 'block';
         signoutButton.style.display = 'none';
@@ -119,22 +106,6 @@ function handleClear() {
  * Print files.
  */
 function listFiles() {
-    gapi.client.request({
-        path: "https://www.googleapis.com/drive/v3/files",
-        method: "GET",
-    }).then(function (response) {
-        appendPre('Files:');
-        var files = response.result.files;
-        if (files && files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                appendPre(file.name + ' (' + file.id + ')');
-            }
-        } else {
-            appendPre('No files found.');
-        }
-    });
-
     // gapi.client.drive.files.list({
     //     'pageSize': 10,
     //     'fields': "nextPageToken, files(id, name)"
@@ -151,20 +122,32 @@ function listFiles() {
     //     }
     // });
 
-
+    gapi.client.request({
+        path: "https://www.googleapis.com/drive/v3/files",
+        method: "post",
+        body: {}
+    }).then(function (response) {
+        appendPre('Files:');
+        var files = response.result.files;
+        if (files && files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                appendPre(file.name + ' (' + file.id + ')');
+            }
+        } else {
+            appendPre('No files found.');
+        }
+    });
 }
 
-/**
- * CREATE FOLDER
- */
+// Create Folder
 function handleCreateFolder() {
     const folderName = document.getElementById("folder_name").value
     gapi.client.request({
         path: "https://www.googleapis.com/drive/v3/files",
         method: "post",
         body: {
-            name: `${folderName}`,
-            mimeType: "application/vnd.google-apps.folder"
+            name: `${folderName}`
         }
     }).then(function (response) {
         appendPre('Created Folder:');
@@ -182,28 +165,13 @@ function handleCreateFolder() {
 
 
 /**
- * DELETE FOLDER
- */
-function handleDeleteFolder() {
-    const folderName = document.getElementById("folder_name").value
-
-    gapi.client.request({
-        path: `https://www.googleapis.com/drive/v3/files/${folderName}`,
-        method: "delete"
-    }).then(function (response) {
-        console.log(response)
-        appendPre('DELETED Folder:');
-        handleListFolders();
-    });
-}
-
-
-/**
- * LIST FOLDERS
+ * List folders
  */
 function handleListFolders() {
     gapi.client.request({
-        path: "https://www.googleapis.com/drive/v3/files?q=mimeType: 'application/vnd.google-apps.folder'",
+        path: "https://www.googleapis.com/drive/v3/files?q=Users",
+        method: "post",
+        body: {}
     }).then(function (response) {
         appendPre('Files:');
         var files = response.result.files;
@@ -213,7 +181,7 @@ function handleListFolders() {
                 appendPre(file.name + ' (' + file.id + ')');
             }
         } else {
-            appendPre('No Folders found.');
+            appendPre('No files found.');
         }
     });
     // gapi.client.drive.files.list({
@@ -232,45 +200,6 @@ function handleListFolders() {
     //     }
     // });
 }
-
-/**
- * CREATE SPREADSHEET
- */
-function handleGetSpreadsheet() {
-    let docName = document.getElementById("spreadsheet_name").value;
-
-    gapi.client.request({
-        path: `https://sheets.googleapis.com/v4/spreadsheets/${docName}`,
-        method: "GET",
-    }).then(function (response) {
-        appendPre('Spreadsheets:');
-        var files = response.result.files;
-        console.log("CREATE SPREADSHEETS RES: ")
-        console.log(response);
-        // list files
-    });
-}
-
-/**
- * GET SPREADSHEET
- */
-function handleCreateSpreadsheet() {
-    let docName = document.getElementById("spreadsheet_name").value
-    gapi.client.request({
-        path: "https://sheets.googleapis.com/v4/spreadsheets",
-        method: "post",
-        body: {
-            name: docName,
-        }
-    }).then(function (response) {
-        appendPre('Spreadsheets:');
-        var files = response.result.files;
-        console.log("CREATE SPREADSHEETS RES: ")
-        console.log(response);
-        // list files
-    });
-}
-
 
 
 // gapi.client.request({
