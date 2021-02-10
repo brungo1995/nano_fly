@@ -90,11 +90,14 @@ function updateSigninStatus(isSignedIn) {
         createFileButton.style.display = 'block';
         getFileButton.style.display = 'block';
         listFilesButton.style.display = 'block';
+        deleteSpreadsheetsFilesButton.style.display = 'block';
+        listSpreadsheetsFilesButton.style.display = 'block';
         document.getElementById("folder_name").style.display = 'block';
+        document.getElementById("spreadsheet_name").style.display = 'block';
+        document.getElementById("sheet_name").style.display = 'block';
+        document.getElementById("purchased_section").style.display = 'block';
 
-        // listFiles();
-        appendPre("SIGNED IN")
-        // appendPre("SIGNED IN ! YEY!!")
+
     } else {
         authorizeButton.style.display = 'block';
         signoutButton.style.display = 'none';
@@ -103,10 +106,15 @@ function updateSigninStatus(isSignedIn) {
         clearButton.style.display = 'none';
         createFolderButton.style.display = 'none';
         deleteFolderButton.style.display = 'none';
-        createFileButton.style.display = 'block';
+        createFileButton.style.display = 'none';
         listFilesButton.style.display = 'none';
-        getFileButton.style.display = 'block';
+        getFileButton.style.display = 'none';
+        deleteSpreadsheetsFilesButton.style.display = 'none';
+        listSpreadsheetsFilesButton.style.display = 'none';
         document.getElementById("folder_name").style.display = 'none';
+        document.getElementById("spreadsheet_name").style.display = 'none';
+        document.getElementById("sheet_name").style.display = 'none';
+        document.getElementById("purchased_section").style.display = 'none';
 
     }
 }
@@ -176,7 +184,7 @@ function handleCreateFolder() {
         path: "https://www.googleapis.com/drive/v3/files",
         method: "post",
         body: {
-            name: `${folderName}`,
+            name: `${folderName || "New folder"}`,
             mimeType: "application/vnd.google-apps.folder"
         }
     }).then(function (response) {
@@ -255,20 +263,72 @@ function handleGetSpreadsheet() {
     });
 }
 
+
+function buildCreateSheet() {
+    let docName = document.getElementById("spreadsheet_name").value
+    let sheetName = document.getElementById("sheet_name").value
+    let purchased = document.getElementById("purchased").checked
+
+    let obj = {
+        // properties: {
+        //     title: `${docName || "New Spreasheet file"}`
+        // },
+        properties:
+        {
+            title: `${docName || "Shopping list"}`
+        },
+
+        sheets: [
+            {
+                properties:
+                {
+                    title: `${sheetName || "Sheet1"}`
+                },
+
+                data: [
+                    {
+                        "startRow": 0, // 1st row
+                        "startColumn": 0, // column 0
+                        "rowData": [
+                            {
+                                values: [
+                                    {
+                                        userEnteredValue: {
+                                            stringValue: "Product Name"
+                                        }
+
+                                    },
+                                    {
+                                        userEnteredValue: {
+                                            stringValue: "Purchased"
+                                        }
+
+                                    },
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+
+    // console.log(docName, sheetName, purchased)
+
+
+    return obj
+}
+
 /**
  * GET SPREADSHEET
  */
 function handleCreateSpreadsheet() {
+    // console.log(buildCreateSheet())
     handleClear()
-    let docName = document.getElementById("spreadsheet_name").value
     gapi.client.request({
         path: "https://sheets.googleapis.com/v4/spreadsheets",
         method: "post",
-        body: {
-            properties: {
-                title: `${docName}`
-            },
-        }
+        body: buildCreateSheet()
     }).then(function (response) {
         appendPre('Spreadsheet Created ');
         console.log("CREATE SPREADSHEETS RES: ")

@@ -50,7 +50,22 @@
         <div class="form_col">
             <h3 for="">Spreadsheets</h3>
             <label for="spreadsheet_name"></label>
-            <input type="text" name="spreadsheet_name" id="spreadsheet_name" placeholder="Spreadsheet Name">
+            <input type="text" class="item" name="spreadsheet_name" id="spreadsheet_name"
+                placeholder="Spreadsheet doc Name">
+            <input type="text" class="item" name="spreadsheet_name" id="sheet_name" placeholder="Sheet Name">
+            <div id="purchased_section" class="item container">
+                <label>Purchased?: </label>
+                <div class="container ">
+                    <label class="container">Yes
+                        <input type="radio" name="purchased" id="purchased">
+                        <span class="checkmark"></span>
+                        <label class="container">No
+                            <input type="radio" name="purchased" checked="checked">
+                            <span class="checkmark"></span>
+                        </label>
+                </div>
+
+            </div>
             <button id="create_file" class="item">Create</button>
             <button id="get_file" class="item">Get Spreadsheet</button>
             <button id="list_spread_files" class="item">List all Spreadsheets</button>
