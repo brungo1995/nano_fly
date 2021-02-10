@@ -28,6 +28,9 @@ var listFilesButton = document.getElementById('list_files');
 var getFileButton = document.getElementById('get_file');
 var listSpreadsheetsFilesButton = document.getElementById('list_spread_files');
 var deleteSpreadsheetsFilesButton = document.getElementById('delete_spread_file');
+var appendDataToFileButton = document.getElementById('append_data');
+
+
 
 /**
  *  On load, called to load the auth2 library and API client library.
@@ -65,9 +68,11 @@ function initClient() {
 
         // File handlers
         createFileButton.onclick = handleCreateSpreadsheet;
-        getFileButton.onclick = handleGetSpreadsheet;
+        getFileButton.onclick = handleGetSheetData;
+        // getFileButton.onclick = handleGetSpreadsheet;
         listSpreadsheetsFilesButton.onclick = handleListSpreadFiles;
         deleteSpreadsheetsFilesButton.onclick = handleDeleteSpreadFile;
+        appendDataToFileButton.onclick = handleAppendNewRow;
 
     }, function (error) {
         appendPre(JSON.stringify(error, null, 2));
@@ -92,10 +97,12 @@ function updateSigninStatus(isSignedIn) {
         listFilesButton.style.display = 'block';
         deleteSpreadsheetsFilesButton.style.display = 'block';
         listSpreadsheetsFilesButton.style.display = 'block';
+        appendDataToFileButton.style.display = 'block';
         document.getElementById("folder_name").style.display = 'block';
         document.getElementById("spreadsheet_name").style.display = 'block';
         document.getElementById("sheet_name").style.display = 'block';
         document.getElementById("purchased_section").style.display = 'block';
+        document.getElementById("product_name").style.display = 'block';
 
 
     } else {
@@ -111,10 +118,12 @@ function updateSigninStatus(isSignedIn) {
         getFileButton.style.display = 'none';
         deleteSpreadsheetsFilesButton.style.display = 'none';
         listSpreadsheetsFilesButton.style.display = 'none';
+        appendDataToFileButton.style.display = 'none';
         document.getElementById("folder_name").style.display = 'none';
         document.getElementById("spreadsheet_name").style.display = 'none';
         document.getElementById("sheet_name").style.display = 'none';
         document.getElementById("purchased_section").style.display = 'none';
+        document.getElementById("product_name").style.display = 'none';
 
     }
 }
@@ -253,16 +262,98 @@ function handleGetSpreadsheet() {
 
     console.log(docName)
     gapi.client.request({
+        // path: `https://sheets.googleapis.com/v4/spreadsheets/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U`,
         path: `https://sheets.googleapis.com/v4/spreadsheets/${docName}`,
         method: "GET",
     }).then(function (response) {
         var title = response.result.properties.title;
         var id = response.result.spreadsheetId;
+        console.log(response)
+
         appendPre(`${title} (${id})`);
         console.log(title, id);
     });
 }
 
+
+/**
+ * Display Sheet data
+ */
+function handleGetSheetData() {
+    let docId = document.getElementById("spreadsheet_name").value
+
+    console.log("fetching data")
+    gapi.client
+        .request({
+            path: `https://sheets.googleapis.com/v4/spreadsheets/${docId}?includeGridData=true`,
+            // path: `https://sheets.googleapis.com/v4/spreadsheets/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U?includeGridData=true`,
+        })
+        .then(function (response) {
+            console.log(response);
+            let sheetValues = response.result.sheets[0].data[0].rowData.map(
+                (row, rowIndex) =>
+                    row.values.map((column, columnIndex) => column.formattedValue)
+            );
+            const headings = sheetValues.shift();
+            console.log(headings);
+
+            let data = (sheetValues || []).map((row) => {
+                let obj = {};
+                row.forEach((colData, colIndex) => {
+                    obj = { ...obj, [`${headings[colIndex]}`]: colData }
+                })
+
+                return obj
+            });
+
+
+            let obj = {
+                headings: headings,
+                data: data
+            }
+
+            displaySheetValues(obj)
+
+            console.log(data)
+
+        });
+
+    // displaySheetValues({
+    //     headings: ["Product Name", "Purchased"],
+    //     data: [
+    //         { "Product Name": "Mango", "Purchased": "TRUE" },
+    //         { "Product Name": "Tuna", "Purchased": "FALSE" },
+    //         { "Product Name": "Bread", "Purchased": "TRUE" }
+    //     ]
+    // })
+
+}
+
+
+function displaySheetValues(data) {
+    let content = ``;
+    let table = document.getElementById("prod_table");
+
+    // Add headings
+    content += "<tr>";
+    (data.headings || []).forEach(heading => {
+        content += `<th>${heading}</th>`
+    });
+    content += `</tr>`;
+
+    // Adding rows
+    (data.data || []).forEach(row => {
+        content += "<tr>"
+        for (var key of Object.keys(row)) {
+            content += `<td>${row[key]}</td>`
+            // console.log(key + " -> " + row[key])
+        }
+        content += "</tr>"
+    })
+
+    table.innerHTML = content;
+
+}
 
 function buildCreateSheet() {
     let docName = document.getElementById("spreadsheet_name").value
@@ -270,9 +361,6 @@ function buildCreateSheet() {
     let purchased = document.getElementById("purchased").checked
 
     let obj = {
-        // properties: {
-        //     title: `${docName || "New Spreasheet file"}`
-        // },
         properties:
         {
             title: `${docName || "Shopping list"}`
@@ -282,7 +370,7 @@ function buildCreateSheet() {
             {
                 properties:
                 {
-                    title: `${sheetName || "Sheet1"}`
+                    title: `${sheetName || "Products"}`
                 },
 
                 data: [
@@ -339,6 +427,37 @@ function handleCreateSpreadsheet() {
         appendPre(`${title} (${id})`);
 
     });
+}
+
+
+function handleAppendNewRow() {
+    let docId = document.getElementById("spreadsheet_name").value
+    // let sheetName = document.getElementById("sheet_name").value
+    let isPurchased = document.getElementById("purchased").checked
+    let productName = document.getElementById("product_name").value
+
+    // console.log(sheetName, isPurchased, productName, docId)
+
+    // POST https://sheets.googleapis.com/v4/spreadsheets/spreadsheetId/values/Sheet1!A1:E1:append?valueInputOption=USER_ENTERED
+    gapi.client
+        .request({
+            // path: `https://sheets.googleapis.com/v4/spreadsheets/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U/values/Products!A1:B1:append?valueInputOption=USER_ENTERED`,
+            path: `https://sheets.googleapis.com/v4/spreadsheets/${docId}/values/Products!A1:B1:append?valueInputOption=USER_ENTERED`,
+            method: "post",
+            body: {
+                // values: [["Tuna", false]],
+                values: [[productName, isPurchased]],
+            },
+        })
+        .then(function (response) {
+            appendPre(`Appended data Successfully`);
+            handleGetSpreadsheet();
+            // console.log(response);
+            // reRenderTable2();
+        })
+        .catch((error) => {
+            appendPre(`Cannot append data to sheet`);
+        });
 }
 
 

@@ -19,6 +19,24 @@
         .form_col .item {
             margin-top: 5px;
         }
+
+        table {
+            margin-top: 10px;
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 16px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 
@@ -52,7 +70,10 @@
             <label for="spreadsheet_name"></label>
             <input type="text" class="item" name="spreadsheet_name" id="spreadsheet_name"
                 placeholder="Spreadsheet doc Name">
+
+            <button id="create_file" class="item">Create</button>
             <input type="text" class="item" name="spreadsheet_name" id="sheet_name" placeholder="Sheet Name">
+            <input type="text" class="item" name="spreadsheet_name" id="product_name" placeholder="Product name">
             <div id="purchased_section" class="item container">
                 <label>Purchased?: </label>
                 <div class="container ">
@@ -66,16 +87,43 @@
                 </div>
 
             </div>
-            <button id="create_file" class="item">Create</button>
+            <button id="append_data" class="item">Append</button>
             <button id="get_file" class="item">Get Spreadsheet</button>
             <button id="list_spread_files" class="item">List all Spreadsheets</button>
             <button id="delete_spread_file" class="item">Delete</button>
 
         </div>
+
+
     </div>
 
     <pre id="content" style="white-space: pre-wrap;"></pre>
     <button id="clear" class="item">Clear</button>
+
+    <div class="container">
+        <table id="prod_table">
+            <!-- <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Points</th>
+            </tr>
+            <tr>
+                <td>Jill</td>
+                <td>Smith</td>
+                <td>50</td>
+            </tr>
+            <tr>
+                <td>Eve</td>
+                <td>Jackson</td>
+                <td>94</td>
+            </tr>
+            <tr>
+                <td>Adam</td>
+                <td>Johnson</td>
+                <td>67</td>
+            </tr> -->
+        </table>
+    </div>
     <script src="client.js"></script>
     <script async defer src="https://apis.google.com/js/api.js" onload="this.onload=function(){};handleClientLoad()"
         onreadystatechange="if (this.readyState === 'complete') this.onload()">
