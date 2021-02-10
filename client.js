@@ -29,6 +29,9 @@ var getFileButton = document.getElementById('get_file');
 var listSpreadsheetsFilesButton = document.getElementById('list_spread_files');
 var deleteSpreadsheetsFilesButton = document.getElementById('delete_spread_file');
 var appendDataToFileButton = document.getElementById('append_data');
+var shareFileButton = document.getElementById('share');
+var unshareFileButton = document.getElementById('unshare');
+var peopleWhoShareFileButton = document.getElementById('people_who_share');
 
 
 
@@ -73,6 +76,9 @@ function initClient() {
         listSpreadsheetsFilesButton.onclick = handleListSpreadFiles;
         deleteSpreadsheetsFilesButton.onclick = handleDeleteSpreadFile;
         appendDataToFileButton.onclick = handleAppendNewRow;
+        shareFileButton.onclick = handleShareFile;
+        unshareFileButton.onclick = handleUnshare;
+        peopleWhoShareFileButton.onclick = handlePeopleWhoShare;
 
     }, function (error) {
         appendPre(JSON.stringify(error, null, 2));
@@ -98,11 +104,15 @@ function updateSigninStatus(isSignedIn) {
         deleteSpreadsheetsFilesButton.style.display = 'block';
         listSpreadsheetsFilesButton.style.display = 'block';
         appendDataToFileButton.style.display = 'block';
+        shareFileButton.style.display = 'block';
+        unshareFileButton.style.display = 'block';
+        peopleWhoShareFileButton.style.display = 'block';
         document.getElementById("folder_name").style.display = 'block';
         document.getElementById("spreadsheet_name").style.display = 'block';
         document.getElementById("sheet_name").style.display = 'block';
         document.getElementById("purchased_section").style.display = 'block';
         document.getElementById("product_name").style.display = 'block';
+        document.getElementById("prod_table").style.display = 'table';
 
 
     } else {
@@ -119,11 +129,16 @@ function updateSigninStatus(isSignedIn) {
         deleteSpreadsheetsFilesButton.style.display = 'none';
         listSpreadsheetsFilesButton.style.display = 'none';
         appendDataToFileButton.style.display = 'none';
+        shareFileButton.style.display = 'none';
+        unshareFileButton.style.display = 'none';
+        peopleWhoShareFileButton.style.display = 'none';
         document.getElementById("folder_name").style.display = 'none';
         document.getElementById("spreadsheet_name").style.display = 'none';
         document.getElementById("sheet_name").style.display = 'none';
         document.getElementById("purchased_section").style.display = 'none';
         document.getElementById("product_name").style.display = 'none';
+        document.getElementById("prod_table").style.display = 'none';
+
 
     }
 }
@@ -132,6 +147,7 @@ function updateSigninStatus(isSignedIn) {
  *  Sign in the user upon button click.
  */
 function handleAuthClick(event) {
+    handleClear()
     gapi.auth2.getAuthInstance().signIn();
 }
 
@@ -139,6 +155,7 @@ function handleAuthClick(event) {
  *  Sign out the user upon button click.
  */
 function handleSignoutClick(event) {
+    handleClear()
     gapi.auth2.getAuthInstance().signOut();
 }
 
@@ -254,7 +271,7 @@ function handleListFolders() {
 
 
 /**
- * CREATE SPREADSHEET
+ * GET SPREADSHEET
  */
 function handleGetSpreadsheet() {
     handleClear()
@@ -408,7 +425,7 @@ function buildCreateSheet() {
 }
 
 /**
- * GET SPREADSHEET
+ * CREATE SPREADSHEET
  */
 function handleCreateSpreadsheet() {
     // console.log(buildCreateSheet())
@@ -429,14 +446,13 @@ function handleCreateSpreadsheet() {
     });
 }
 
-
+/** APPEND ROW */
 function handleAppendNewRow() {
     let docId = document.getElementById("spreadsheet_name").value
     // let sheetName = document.getElementById("sheet_name").value
     let isPurchased = document.getElementById("purchased").checked
     let productName = document.getElementById("product_name").value
 
-    // console.log(sheetName, isPurchased, productName, docId)
 
     // POST https://sheets.googleapis.com/v4/spreadsheets/spreadsheetId/values/Sheet1!A1:E1:append?valueInputOption=USER_ENTERED
     gapi.client
@@ -457,6 +473,62 @@ function handleAppendNewRow() {
         })
         .catch((error) => {
             appendPre(`Cannot append data to sheet`);
+        });
+}
+
+/** SHARE SHEET */
+function handleShareFile() {
+    let docId = document.getElementById("spreadsheet_name").value;
+    gapi.client
+        .request({
+            // path: `https://www.googleapis.com/drive/v3/files/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U/permissions?emailMessage='Hey Jason did you get the invitation'`,
+            path: `https://www.googleapis.com/drive/v3/files/${docId}/permissions?emailMessage='Hey Jason did you get the invitation'`,
+            method: "post",
+            body: {
+                role: "writer",
+                type: "user",
+                // emailAddress: "jason@nanosoft.co.za",
+                emailAddress: "brungo1995@gmail.com",
+            },
+        })
+        .then((response) => {
+            console.log("Shared filed")
+            console.log(response);
+        });
+}
+
+
+/** UNSHARE FILE */
+function handleUnshare() {
+    let docId = document.getElementById("spreadsheet_name").value;
+
+    gapi.client
+        .request({
+            path: `https://www.googleapis.com/drive/v3/files/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U/permissions/06295840178656814372`,
+            // path: `https://www.googleapis.com/drive/v3/files/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U/permissions/13934111265224148781`,
+            method: "delete",
+        })
+        .then((response) => {
+            console.log(response);
+        });
+}
+
+
+/**HANDLE PEOPLE LIST OF SHARED PEOPLE */
+function handlePeopleWhoShare() {
+    let docId = document.getElementById("spreadsheet_name").value;
+    gapi.client
+        .request({
+            // path: `https://www.googleapis.com/drive/v3/files/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U?fields=*`,
+            path: `https://www.googleapis.com/drive/v3/files/${docId}?fields=*`,
+        })
+        .then(function (response) {
+            console.log(response)
+            handleClear();
+            (response.result.permissions || []).forEach(permission => {
+                appendPre(`Name: ${permission.displayName} PermissionId: ${permission.id}`)
+            })
+            // console.log(response.result.permissions.map((perm) => perm.displayName));
         });
 }
 
@@ -504,21 +576,3 @@ function handleDeleteSpreadFile() {
         handleListSpreadFiles();
     });
 }
-
-
-// gapi.client.request({
-//     path: "https://www.googleapis.com/drive/v3/files",
-//     method: "post",
-//     body:{}
-// }).then(function (response) {
-//     appendPre('Files:');
-//     var files = response.result.files;
-//     if (files && files.length > 0) {
-//         for (var i = 0; i < files.length; i++) {
-//             var file = files[i];
-//             appendPre(file.name + ' (' + file.id + ')');
-//         }
-//     } else {
-//         appendPre('No files found.');
-//     }
-// });
