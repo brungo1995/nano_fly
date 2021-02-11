@@ -18,20 +18,22 @@ var signoutButton = document.getElementById('signout_button');
 
 // Folders
 var listFoldersButton = document.getElementById('list_folders');
-var clearButton = document.getElementById('clear');
+// var clearButton = document.getElementById('clear');
 var createFolderButton = document.getElementById('create_folder');
-var deleteFolderButton = document.getElementById('delete_folder');
+// var deleteFolderButton = document.getElementById('delete_folder');
 
 //Files
-var createFileButton = document.getElementById('create_file');
-var listFilesButton = document.getElementById('list_files');
-var getFileButton = document.getElementById('get_file');
 var listSpreadsheetsFilesButton = document.getElementById('list_spread_files');
-var deleteSpreadsheetsFilesButton = document.getElementById('delete_spread_file');
-var appendDataToFileButton = document.getElementById('append_data');
-var shareFileButton = document.getElementById('share');
-var unshareFileButton = document.getElementById('unshare');
-var peopleWhoShareFileButton = document.getElementById('people_who_share');
+var listFilesButton = document.getElementById('list_files');
+// var getFileButton = document.getElementById('get_file');
+var createSheetButton = document.getElementById('create_sheet');
+// var deleteSpreadsheetsFilesButton = document.getElementById('delete_spread_file');
+// var appendDataToFileButton = document.getElementById('append_data');
+// var shareFileButton = document.getElementById('share');
+// var unshareFileButton = document.getElementById('unshare');
+// var peopleWhoShareFileButton = document.getElementById('people_who_share');
+// var updateFileButton = document.getElementById('update');
+// var deleteLastRowFileButton = document.getElementById('delete_last_row');
 
 
 
@@ -63,22 +65,24 @@ function initClient() {
         listFilesButton.onclick = listFiles;
 
 
-        // Register folder handlers
+        // // Register folder handlers
         listFoldersButton.onclick = handleListFolders;
-        clearButton.onclick = handleClear;
+        // clearButton.onclick = handleClear;
         createFolderButton.onclick = handleCreateFolder;
-        deleteFolderButton.onclick = handleDeleteFolder;
+        // deleteFolderButton.onclick = handleDeleteFolder;
 
-        // File handlers
-        createFileButton.onclick = handleCreateSpreadsheet;
-        getFileButton.onclick = handleGetSheetData;
-        // getFileButton.onclick = handleGetSpreadsheet;
+        // // File handlers
+        createSheetButton.onclick = handleCreateSpreadsheet;
+        // getFileButton.onclick = handleGetSheetData;
+        // // getFileButton.onclick = handleGetSpreadsheet;
         listSpreadsheetsFilesButton.onclick = handleListSpreadFiles;
-        deleteSpreadsheetsFilesButton.onclick = handleDeleteSpreadFile;
-        appendDataToFileButton.onclick = handleAppendNewRow;
-        shareFileButton.onclick = handleShareFile;
-        unshareFileButton.onclick = handleUnshare;
-        peopleWhoShareFileButton.onclick = handlePeopleWhoShare;
+        // deleteSpreadsheetsFilesButton.onclick = handleDeleteSpreadFile;
+        // appendDataToFileButton.onclick = handleAppendNewRow;
+        // shareFileButton.onclick = handleShareFile;
+        // unshareFileButton.onclick = handleUnshare;
+        // peopleWhoShareFileButton.onclick = handlePeopleWhoShare;
+        // updateFileButton.onclick = handleUpdateRow;
+        // deleteLastRowFileButton.onclick = handleDeleteRow;
 
     }, function (error) {
         appendPre(JSON.stringify(error, null, 2));
@@ -93,52 +97,67 @@ function updateSigninStatus(isSignedIn) {
     if (isSignedIn) {
         authorizeButton.style.display = 'none';
         signoutButton.style.display = 'block';
+        head_controls.style.display = 'flex';
 
         listFoldersButton.style.display = 'block';
-        clearButton.style.display = 'block';
+        // clearButton.style.display = 'block';
         createFolderButton.style.display = 'block';
-        deleteFolderButton.style.display = 'block';
-        createFileButton.style.display = 'block';
-        getFileButton.style.display = 'block';
+        // deleteFolderButton.style.display = 'block';
+        createSheetButton.style.display = 'block';
+        // getFileButton.style.display = 'block';
         listFilesButton.style.display = 'block';
-        deleteSpreadsheetsFilesButton.style.display = 'block';
+        // deleteSpreadsheetsFilesButton.style.display = 'block';
         listSpreadsheetsFilesButton.style.display = 'block';
-        appendDataToFileButton.style.display = 'block';
-        shareFileButton.style.display = 'block';
-        unshareFileButton.style.display = 'block';
-        peopleWhoShareFileButton.style.display = 'block';
-        document.getElementById("folder_name").style.display = 'block';
-        document.getElementById("spreadsheet_name").style.display = 'block';
-        document.getElementById("sheet_name").style.display = 'block';
-        document.getElementById("purchased_section").style.display = 'block';
-        document.getElementById("product_name").style.display = 'block';
-        document.getElementById("prod_table").style.display = 'table';
+        // appendDataToFileButton.style.display = 'block';
+        // shareFileButton.style.display = 'block';
+        // unshareFileButton.style.display = 'block';
+        // peopleWhoShareFileButton.style.display = 'block';
+        // updateFileButton.style.display = 'block';
+        // deleteLastRowFileButton.style.display = 'block';
+        // document.getElementById("folder_name").style.display = 'block';
+        // document.getElementById("spreadsheet_name").style.display = 'block';
+        // document.getElementById("sheet_name").style.display = 'block';
+        // document.getElementById("purchased_section").style.display = 'block';
+        // document.getElementById("product_name").style.display = 'block';
+        // document.getElementById("prod_table").style.display = 'table';
+
+        // Tables
+        document.getElementById("list_files_section").style.display = 'none';
+        document.getElementById("file_detail_section").style.display = 'none';
+
 
 
     } else {
         authorizeButton.style.display = 'block';
         signoutButton.style.display = 'none';
+        head_controls.style.display = 'none';
 
         listFoldersButton.style.display = 'none';
-        clearButton.style.display = 'none';
-        createFolderButton.style.display = 'none';
-        deleteFolderButton.style.display = 'none';
-        createFileButton.style.display = 'none';
+        // clearButton.style.display = 'none';
+        // createFolderButton.style.display = 'none';
+        // deleteFolderButton.style.display = 'none';
+        createSheetButton.style.display = 'none';
         listFilesButton.style.display = 'none';
-        getFileButton.style.display = 'none';
-        deleteSpreadsheetsFilesButton.style.display = 'none';
+        // getFileButton.style.display = 'none';
+        // deleteSpreadsheetsFilesButton.style.display = 'none';
         listSpreadsheetsFilesButton.style.display = 'none';
-        appendDataToFileButton.style.display = 'none';
-        shareFileButton.style.display = 'none';
-        unshareFileButton.style.display = 'none';
-        peopleWhoShareFileButton.style.display = 'none';
-        document.getElementById("folder_name").style.display = 'none';
-        document.getElementById("spreadsheet_name").style.display = 'none';
-        document.getElementById("sheet_name").style.display = 'none';
-        document.getElementById("purchased_section").style.display = 'none';
-        document.getElementById("product_name").style.display = 'none';
-        document.getElementById("prod_table").style.display = 'none';
+        // appendDataToFileButton.style.display = 'none';
+        // shareFileButton.style.display = 'none';
+        // unshareFileButton.style.display = 'none';
+        // peopleWhoShareFileButton.style.display = 'none';
+        // updateFileButton.style.display = 'none';
+        // deleteLastRowFileButton.style.display = 'none';
+        // document.getElementById("folder_name").style.display = 'none';
+        // document.getElementById("spreadsheet_name").style.display = 'none';
+        // document.getElementById("sheet_name").style.display = 'none';
+        // document.getElementById("purchased_section").style.display = 'none';
+        // document.getElementById("product_name").style.display = 'none';
+        // document.getElementById("prod_table").style.display = 'none';
 
+
+        // Tables
+        document.getElementById("list_files_section").style.display = 'none';
+        document.getElementById("file_detail_section").style.display = 'none';
 
     }
 }
@@ -180,21 +199,37 @@ function handleClear() {
  * Print files.
  */
 function listFiles() {
-    handleClear()
+    document.getElementById("list_files_section").style.display = 'none';
+    document.getElementById("list_files_section").style.display = 'flex';
+
     gapi.client.request({
         path: "https://www.googleapis.com/drive/v3/files",
         method: "GET",
     }).then(function (response) {
-        appendPre('Files:');
-        var files = response.result.files;
-        if (files && files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                appendPre(file.name + ' (' + file.id + ')');
-            }
+        let files = response.result.files;
+        console.log(response)
+
+        let content = ``;
+        content += buildListFilesTableHead()
+
+        if (files && files.length <= 0) {
+            content += ``;
         } else {
-            appendPre('No files found.');
+
+            files = (response.result.files || []).map((file => {
+                const { id, name, mimeType } = file;
+                let obj = {};
+                obj['id'] = id;
+                obj['name'] = name;
+                obj['mimeType'] = mimeType;
+                obj['type'] = mimeType.toLowerCase().includes('folder') ? "🗂️" : "📗 "
+                return obj
+            }));
+
+            content += buildListTableBody(files)
         }
+
+        buildListTable(content)
     });
 
 
@@ -204,8 +239,7 @@ function listFiles() {
  * CREATE FOLDER
  */
 function handleCreateFolder() {
-    handleClear()
-    const folderName = document.getElementById("folder_name").value
+    const folderName = document.getElementById("resource_name").value
     gapi.client.request({
         path: "https://www.googleapis.com/drive/v3/files",
         method: "post",
@@ -214,96 +248,216 @@ function handleCreateFolder() {
             mimeType: "application/vnd.google-apps.folder"
         }
     }).then(function (response) {
-        appendPre('Created Folder:');
-        handleListFolders();
-        var files = response.result.files;
-        if (files && files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                appendPre(file.name + ' (' + file.id + ')');
-            }
-        } else {
-            appendPre('No files found.');
-        }
+        console.log("Created Folder");
+        console.log(response);
+        handleListFolders()
     });
 }
 
 
-/**
- * DELETE FOLDER
- */
-function handleDeleteFolder() {
-    handleClear()
-    const folderName = document.getElementById("folder_name").value
 
-    gapi.client.request({
-        path: `https://www.googleapis.com/drive/v3/files/${folderName}`,
-        method: "delete"
-    }).then(function (response) {
-        console.log(response)
-        appendPre('DELETED Folder:');
-        handleListFolders();
-    });
+
+function buildListFilesTableHead() {
+    let content = ``;
+    content += ` <thead class="thead-dark">`;
+    content += `<tr>`;
+    content += `<th scope="col">#</th>`;
+    content += `<th scope="col">Name</th>`;
+    content += `<th scope="col">Id</th>`;
+    content += `<th scope="col">Resource Type</th>`;
+    content += `<th scope="col">Actions</th>`;
+    content += `</tr>`;
+    content += `</thead>`;
+    return content;
 }
 
+function buildListTableBody(files) {
+    let content = ``;
+    content += ` <tbody>`;
+    files.forEach((file, index) => {
+        const { name, type, id, mimeType } = file
+        content += `<tr>`;
+        content += `<th scope="row">${index}</th>`;
+        content += `<td>${name}</td>`;
+        content += `<td>${id}</td>`;
+        content += `<td>${type}</td>`;
+        content += `<td style="padding-top: 6px;">`;
+        content += `<div class="row" style="flex-wrap: nowrap">`;
+        content += `<button type="button" class="btn btn-light btn-sm">Shared with</button>`;
+        content += `<button type="button" class="btn btn-light btn-sm ml-2" onclick="getFile('${id}', '${mimeType}')">Display</button>`;
+        content += `<button type="button" class="btn btn-light btn-sm ml-2 mr-2" onclick="deleteFile('${id}', '${mimeType}')">Delete file</button>`;
+        content += ` </div>`;
+        content += `</td>`;
+        content += `</tr>`;
+    });
+    content += ` </tbody>`;
+
+    return content
+}
+
+function buildListTable(content) {
+    let table = document.getElementById("list_files_table");
+    table.innerHTML = content;
+}
 
 /**
  * LIST FOLDERS
  */
 function handleListFolders() {
-    handleClear()
+    document.getElementById("list_files_section").style.display = 'flex';
     gapi.client.request({
         path: "https://www.googleapis.com/drive/v3/files?q=mimeType: 'application/vnd.google-apps.folder'",
     }).then(function (response) {
-        appendPre('Files:');
-        var files = response.result.files;
-        if (files && files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                appendPre(file.name + ' (' + file.id + ')');
-            }
-        } else {
-            appendPre('No Folders found.');
-        }
-    });
-
-}
-
-
-/**
- * GET SPREADSHEET
- */
-function handleGetSpreadsheet() {
-    handleClear()
-    let docName = document.getElementById("spreadsheet_name").value;
-
-    console.log(docName)
-    gapi.client.request({
-        // path: `https://sheets.googleapis.com/v4/spreadsheets/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U`,
-        path: `https://sheets.googleapis.com/v4/spreadsheets/${docName}`,
-        method: "GET",
-    }).then(function (response) {
-        var title = response.result.properties.title;
-        var id = response.result.spreadsheetId;
+        let files = response.result.files;
+        console.log("Folders result")
         console.log(response)
 
-        appendPre(`${title} (${id})`);
-        console.log(title, id);
+        let content = ``;
+        content += buildListFilesTableHead()
+
+        if (files && files.length <= 0) {
+            content += ``;
+        } else {
+
+            files = (response.result.files || []).map((file => {
+                const { id, name, mimeType } = file;
+                let obj = {};
+                obj['id'] = id;
+                obj['name'] = name;
+                obj['mimeType'] = mimeType;
+                obj['type'] = "🗂️"
+                return obj
+            }));
+
+            content += buildListTableBody(files)
+        }
+
+        buildListTable(content)
+
+
+
+    });
+
+}
+
+function displayFolderData(id) {
+
+}
+
+function buildTableHeadForFolderDetails() {
+    let content = ``;
+    content += ` <thead class="thead-dark">`;
+    content += `<tr>`;
+    content += `<th scope="col">#</th>`;
+    content += `<th scope="col">Name</th>`;
+    content += ` <th scope="col">Created at</th>`;
+    content += `<th scope="col">Last Modified by</th>`;
+    content += `<th scope="col">Modified time</th>`;
+    content += `<th scope="col">Owned by me</th>`;
+    content += `<th scope="col">Actions</th>`;
+    content += `</tr>`;
+    content += `</thead>`;
+    return content;
+}
+
+
+function buildTableBodyForFolderDetails(file) {
+    let content = ``;
+    content += ` <tbody>`;
+
+    // files.forEach((file, index) => {
+    const { name, createdTime, lastModifyingUser, modifiedTime, ownedByMe } = file
+    content += `<tr>`;
+    content += `<th scope="row">${1}</th>`;
+    content += `<td>${name}</td>`;
+    content += `<td>${createdTime}</td>`;
+    content += `<td>${lastModifyingUser}</td>`;
+    content += `<td>${modifiedTime}</td>`;
+    content += `<td>${ownedByMe ? "👍" : "❌ "}</td>`;
+    content += `<td style="padding-top: 6px;">`;
+    content += `<div class="row" style="flex-wrap: nowrap">`;
+    content += `<button type="button" class="btn btn-light btn-sm">Edit Share</button>`;
+    content += ` </div>`;
+    content += `</td>`;
+    content += `</tr>`;
+    // });
+
+    content += ` </tbody>`;
+
+    return content
+}
+
+function buildFileDetailTable(content) {
+    let table = document.getElementById("file_detail_table");
+    table.innerHTML = content;
+}
+
+/**GET FOLDER  */
+function getFolder(id) {
+    document.getElementById("file_detail_section").style.display = 'flex';
+
+    gapi.client.request({
+        path: `https://www.googleapis.com/drive/v3/files/${id || "1vH-s7vuXt-g2_A2QSPyNSBsOgrdxSDQB"}?fields=*`,
+        method: "GET",
+    }).then(function (response) {
+        console.log('Folder result')
+        console.log(response);
+        const { createdTime, name, lastModifyingUser, modifiedTime, ownedByMe, owners, permissionIds, permissions } = response.result;
+        let content = ``;
+        let obj = {};
+        obj['name'] = name;
+        obj['createdTime'] = createdTime;
+        obj['lastModifyingUser'] = lastModifyingUser.displayName
+        obj['modifiedTime'] = modifiedTime
+        obj['ownedByMe'] = ownedByMe
+
+        content += buildTableHeadForFolderDetails();
+        content += buildTableBodyForFolderDetails(obj);
+        buildFileDetailTable(content);
     });
 }
+
+/**GET ANY FILE */
+function getFile(id, mimeType) {
+    if (mimeType.toLowerCase().includes('folder')) {
+        getFolder(id)
+    }
+
+    else {
+        handleGetSheetData(id)
+        // handleGetSpreadsheet(id)
+    }
+
+}
+
+/** DELETE FILE */
+function deleteFile(id, mimeType) {
+    gapi.client.request({
+        path: `https://www.googleapis.com/drive/v3/files/${id}`,
+        method: "delete"
+    }).then(function (response) {
+        console.log(response)
+        if (mimeType.toLowerCase().includes('folder')) {
+            handleListFolders()
+            return
+        }
+
+        handleListSpreadFiles()
+
+    });
+}
+
+
 
 
 /**
  * Display Sheet data
  */
-function handleGetSheetData() {
-    let docId = document.getElementById("spreadsheet_name").value
+function handleGetSheetData(id) {
 
-    console.log("fetching data")
     gapi.client
         .request({
-            path: `https://sheets.googleapis.com/v4/spreadsheets/${docId}?includeGridData=true`,
-            // path: `https://sheets.googleapis.com/v4/spreadsheets/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U?includeGridData=true`,
+            path: `https://sheets.googleapis.com/v4/spreadsheets/${id || "1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U"}?includeGridData=true`,
         })
         .then(function (response) {
             console.log(response);
@@ -331,117 +485,130 @@ function handleGetSheetData() {
 
             displaySheetValues(obj)
 
-            console.log(data)
+            // console.log(data)
 
         });
 
-    // displaySheetValues({
-    //     headings: ["Product Name", "Purchased"],
-    //     data: [
-    //         { "Product Name": "Mango", "Purchased": "TRUE" },
-    //         { "Product Name": "Tuna", "Purchased": "FALSE" },
-    //         { "Product Name": "Bread", "Purchased": "TRUE" }
-    //     ]
-    // })
+
 
 }
 
 
 function displaySheetValues(data) {
     let content = ``;
-    let table = document.getElementById("prod_table");
+    content += buildTableHeadForSheet(data.headings);
+    content += buildTableBodySheet(data.data)
+    buildSheetTable(content)
+}
 
-    // Add headings
-    content += "<tr>";
-    (data.headings || []).forEach(heading => {
-        content += `<th>${heading}</th>`
-    });
+function buildTableHeadForSheet(headings) {
+    let content = ``;
+    content += ` <thead class="thead-dark">`;
+    content += `<tr>`;
+    content += `<th scope="col">#</th>`;
+    (headings || []).forEach((heading => {
+        content += ` <th scope="col">${heading}</th>`;
+    }));
+    content += `<th scope="col">Actions</th>`;
     content += `</tr>`;
+    content += `</thead>`;
+    return content;
+}
 
-    // Adding rows
-    (data.data || []).forEach(row => {
-        content += "<tr>"
+function buildTableBodySheet(data) {
+    let content = ``;
+    content += ` <tbody>`;
+
+    (data || []).forEach((row, index) => {
+        content += `<tr>`;
+
+        content += `<td>${index + 1}</td>`;
+
         for (var key of Object.keys(row)) {
-            content += `<td>${row[key]}</td>`
-            // console.log(key + " -> " + row[key])
+            content += `<td>
+                        <input type="text" class="form-control" value="${row[key]}">
+                    </td>`;
         }
-        content += "</tr>"
-    })
 
+        // content += `<td style="padding-top: 6px;">`;
+        content += `<td >`;
+        content += `<div class="row" style="flex-wrap: nowrap">`;
+        // content += `<button type="button" class="btn btn-light mr-2">Edit Share</button>`;
+        content += `<button type="button" class="btn btn-light mr-2">Save change</button>`;
+        content += `<button type="button" class="btn btn-light  mr-2">Remove Row</button>`;
+        content += ` </div>`;
+        content += `</td>`;
+
+        content += `</tr>`;
+    });
+
+    content += ` </tbody>`;
+
+    return content
+}
+
+function buildSheetTable(content) {
+    document.getElementById("file_detail_section").style.display = 'flex';
+    let table = document.getElementById("file_detail_table");
     table.innerHTML = content;
-
 }
 
-function buildCreateSheet() {
-    let docName = document.getElementById("spreadsheet_name").value
-    let sheetName = document.getElementById("sheet_name").value
-    let purchased = document.getElementById("purchased").checked
 
-    let obj = {
-        properties:
-        {
-            title: `${docName || "Shopping list"}`
-        },
-
-        sheets: [
-            {
-                properties:
-                {
-                    title: `${sheetName || "Products"}`
-                },
-
-                data: [
-                    {
-                        "startRow": 0, // 1st row
-                        "startColumn": 0, // column 0
-                        "rowData": [
-                            {
-                                values: [
-                                    {
-                                        userEnteredValue: {
-                                            stringValue: "Product Name"
-                                        }
-
-                                    },
-                                    {
-                                        userEnteredValue: {
-                                            stringValue: "Purchased"
-                                        }
-
-                                    },
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    }
-
-    // console.log(docName, sheetName, purchased)
-
-
-    return obj
-}
 
 /**
  * CREATE SPREADSHEET
  */
 function handleCreateSpreadsheet() {
-    // console.log(buildCreateSheet())
-    handleClear()
+    const docName = document.getElementById("resource_name").value
+
     gapi.client.request({
         path: "https://sheets.googleapis.com/v4/spreadsheets",
         method: "post",
-        body: buildCreateSheet()
-    }).then(function (response) {
-        appendPre('Spreadsheet Created ');
-        console.log("CREATE SPREADSHEETS RES: ")
-        console.log(response);
-        var title = response.result.properties.title;
-        var id = response.result.spreadsheetId;
+        body: {
+            properties:
+            {
+                title: `${docName || "Shopping List by you"}`
+            },
 
-        appendPre(`${title} (${id})`);
+            sheets: [
+                {
+                    properties:
+                    {
+                        title: `${"Products"}`
+                    },
+
+                    data: [
+                        {
+                            "startRow": 0, // 1st row
+                            "startColumn": 0, // column 0
+                            "rowData": [
+                                {
+                                    values: [
+                                        {
+                                            userEnteredValue: {
+                                                stringValue: "Product Name"
+                                            }
+
+                                        },
+                                        {
+                                            userEnteredValue: {
+                                                stringValue: "Purchased"
+                                            }
+
+                                        },
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+        // body: buildCreateSheet()
+    }).then(function (response) {
+        console.log("Created Sheet");
+        console.log(response);
+        handleListSpreadFiles()
 
     });
 }
@@ -504,7 +671,7 @@ function handleUnshare() {
 
     gapi.client
         .request({
-            path: `https://www.googleapis.com/drive/v3/files/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U/permissions/06295840178656814372`,
+            path: `https://www.googleapis.com/drive/v3/files/${docId}/permissions/06295840178656814372`,
             // path: `https://www.googleapis.com/drive/v3/files/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U/permissions/13934111265224148781`,
             method: "delete",
         })
@@ -533,46 +700,121 @@ function handlePeopleWhoShare() {
 }
 
 
+
+/**UPDATE ROW */
+function handleUpdateRow() {
+    let docId = document.getElementById("spreadsheet_name").value
+    // let sheetName = document.getElementById("sheet_name").value
+    let isPurchased = document.getElementById("purchased").checked
+    let productName = document.getElementById("product_name").value
+
+    gapi.client
+        .request({
+            path: `https://sheets.googleapis.com/v4/spreadsheets/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U/values/Products!A5:B5?valueInputOption=USER_ENTERED`,
+            method: "put",
+            body: {
+                // "range": "Products!A4:B4",
+                values: [["Rice", true]],
+                // range: "A5:B5",
+                // values: [[productName, isPurchased]],
+            },
+        })
+        .then(function (response) {
+            console.log(response);
+            // appendPre(`Appended data Successfully`);
+            handleGetSpreadsheet();
+        })
+        .catch((error) => {
+            appendPre(`Cannot append data to sheet`);
+        });
+}
+
+/**DELETE ROW */
+function handleDeleteRow() {
+    let docId = document.getElementById("spreadsheet_name").value
+    let isPurchased = document.getElementById("purchased").checked
+    let productName = document.getElementById("product_name").value
+
+    gapi.client
+        .request({
+            // POST https://sheets.googleapis.com/v4/spreadsheets/spreadsheetId:batchUpdate
+            path: `https://sheets.googleapis.com/v4/spreadsheets/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U:batchUpdate`,
+            method: "post",
+            body: {
+                "requests": [
+                    {
+                        "deleteDimension": {
+                            "range": {
+                                // A sheet's sheetId can be retrieved using the spreadsheet.get method.
+                                "sheetId": 1837341742,
+                                "dimension": "ROWS",
+                                "startIndex": 3,
+                                "endIndex": 4
+                            }
+                        }
+                    }
+                ],
+            }
+        })
+        .then(function (response) {
+            console.log("DELETED ROW")
+            console.log(response);
+            // appendPre(`Appended data Successfully`);
+            handleGetSheetData();
+        })
+        .catch((error) => {
+            appendPre(`Cannot delete row`);
+        });
+}
+
+
 /**
  * LIST ALL SPREAD FILES
  */
 function handleListSpreadFiles() {
+    document.getElementById("list_files_section").style.display = 'none';
+    document.getElementById("list_files_section").style.display = 'flex';
 
     gapi.client.request({
         path: "https://www.googleapis.com/drive/v3/files?q=mimeType: 'application/vnd.google-apps.spreadsheet'",
     }).then(function (response) {
-        handleClear()
-        appendPre('Spreadsheets:');
-        var files = response.result.files;
-        if (files && files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                appendPre(file.name + ' (' + file.id + ')');
-            }
-        } else {
-            appendPre('No Spreadsheets found.');
-        }
-    });
-
-
-
-
-}
-
-
-/**
- * DELETE SPREADSHEET
- */
-function handleDeleteSpreadFile() {
-    handleClear()
-    let docName = document.getElementById("spreadsheet_name").value
-
-    gapi.client.request({
-        path: `https://www.googleapis.com/drive/v3/files/${docName}`,
-        method: "delete"
-    }).then(function (response) {
+        let files = response.result.files;
         console.log(response)
-        appendPre('DELETED File:');
-        handleListSpreadFiles();
+
+        let content = ``;
+        content += buildListFilesTableHead()
+
+        if (files && files.length <= 0) {
+            content += ``;
+        } else {
+
+            files = (response.result.files || []).map((file => {
+                const { id, name, mimeType } = file;
+                let obj = {};
+                obj['id'] = id;
+                obj['name'] = name;
+                obj['mimeType'] = mimeType;
+                obj['type'] = "📗 "
+                return obj
+            }));
+
+            content += buildListTableBody(files)
+        }
+
+        buildListTable(content)
+
+
+        // var files = response.result.files;
+        // if (files && files.length > 0) {
+        //     for (var i = 0; i < files.length; i++) {
+        //         var file = files[i];
+        //         appendPre(file.name + ' (' + file.id + ')');
+        //     }
+        // } else {
+        //     appendPre('No Spreadsheets found.');
+        // }
     });
+
 }
+
+

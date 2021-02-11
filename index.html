@@ -3,69 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Google App1</title>
-    <style>
-        .container {
-            display: flex;
-            max-width: 500px;
-            justify-content: space-evenly;
-        }
-
-        .form_col {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form_col .item {
-            margin-top: 5px;
-        }
-
-        table {
-            margin-top: 10px;
-            border-collapse: collapse;
-            border-spacing: 0;
-            width: 100%;
-            border: 1px solid #ddd;
-        }
-
-        th,
-        td {
-            text-align: left;
-            padding: 16px;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <title>Google drive API</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 
 <body>
-    <p>Drive API Quickstart by Edvaldo</p>
-    <!--Add buttons to initiate auth sequence and sign out-->
     <div class="container">
+        <p class="text-center">Drive API Quickstart</p>
 
         <!-- Authorization -->
-        <div class="form_col">
-            <h3 for="">Authorization</h3>
-            <button id="authorize_button" style="display: none;">Authorize</button>
-            <button id="signout_button" style="display: none;">Sign Out</button>
-            <button id="list_files" class="item">List all Files</button>
-
+        <div class="row justify-content-end">
+            <button id="authorize_button" style="display: none;" class="btn btn-outline-secondary">Authorize</button>
+            <button id="signout_button" style="display: none;" class="btn btn-outline-danger">Sign Out</button>
         </div>
 
+        <!-- Main -->
+        <main class="row mt-5" id="main_content">
+            <div class="col">
+                <div class="row" id="head_controls">
+                    <div class="col">
+                        <div class="input-group mb-3 w-50 row m-auto">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1">Resource</span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="name to create" id="resource_name">
+                        </div>
+                        <div class="row mt-2 justify-content-center">
+                            <button type="button" class="btn btn-outline-secondary " id="create_folder">Create
+                                Folder</button>
+                            <button type="button" class="btn btn-outline-secondary ml-2" id="create_sheet">Create
+                                Spread.</button>
+                            <!-- <button type="button" class="btn btn-outline-secondary ml-2" id="">Get by Id</button> -->
+
+                            <div class="dropdown  ml-2">
+                                <a class="btn btn-outline-secondary dropdown-toggle" href="#" role="button"
+                                    id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
+                                    aria-expanded="false">
+                                    Lists
+                                </a>
+
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    <a class="dropdown-item" href="#" id="list_files">All files </a>
+                                    <a class="dropdown-item" href="#" id="list_folders">Folders</a>
+                                    <a class="dropdown-item" href="#" id="list_spread_files">Spreadsheets </a>
+                                </div>
+                            </div>
+                            <!-- <button type="button" class="btn btn-outline-secondary ml-2">Secondary</button> -->
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Lists -->
+                <section class="row mt-5" id="list_files_section">
+                    <div class="col">
+                        <h3>Files List </h3>
+                        <table class="table table-striped" style="width: fit-content" id="list_files_table">
+                        </table>
+                    </div>
+                </section>
+
+
+                <!-- Display Content -->
+                <section class="row mt-5" id="file_detail_section">
+                    <div class="col">
+                        <h3>File Data </h3>
+                        <table class="table table-striped" style="width: fit-content" id="file_detail_table">
+
+                        </table>
+                        <!-- <table class="table " style="width: fit-content">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Product name</th>
+                                    <th scope="col">Purchased?</th>
+                                    <th scope="col">Purchased?</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">
+                                        <input type="text" class="form-control" placeholder="Id, name to search/create">
+                                    </th>
+                                    <td>
+                                        <div class="row"><input type="text" class="form-control"
+                                                placeholder="Id, name to search/create"></div>
+                                    </td>
+                                    <td><input type="text" class="form-control" placeholder="Id, name to search/create">
+                                    </td>
+                                    <td>
+                                        <div class="row">
+                                            <button type="button" class="btn btn-light ">Remove row</button>
+                                            <button type="button" class="btn btn-light ">Save change</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table> -->
+
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- <button id="list_files" class="item">List all Files</button> -->
+
+
         <!-- Folders -->
-        <div class="form_col">
+        <!-- <div class="form_col">
             <h3 for="">Folders</h3>
             <label for="folder_name"></label>
             <input type="text" name="folder_name" id="folder_name" placeholder="Folder name">
             <button id="create_folder" class="item">Create</button>
             <button id="list_folders" class="item">List all folders</button>
             <button id="delete_folder" class="item">Delete</button>
-        </div>
+        </div> -->
 
         <!-- Sheets -->
-        <div class="form_col">
+        <!-- <div class="form_col">
             <h3 for="">Spreadsheets</h3>
             <label for="spreadsheet_name"></label>
             <input type="text" class="item" name="spreadsheet_name" id="spreadsheet_name"
@@ -92,16 +149,18 @@
             <button id="list_spread_files" class="item">List all Spreadsheets</button>
             <button id="share" class="item">Share</button>
             <button id="unshare" class="item">Unshare</button>
+            <button id="update" class="item">Update Row</button>
             <button id="people_who_share" class="item">List people who shared file with</button>
-            <button id="delete_spread_file" class="item">Delete</button>
+            <button id="delete_last_row" class="item">Delete Last Row</button>
+            <button id="delete_spread_file" class="item">Delete File</button>
 
-        </div>
+        </div> -->
 
 
+
+        <pre id="content" style="white-space: pre-wrap;"></pre>
+        <!-- <button id="clear" class="item">Clear</button> -->
     </div>
-
-    <pre id="content" style="white-space: pre-wrap;"></pre>
-    <button id="clear" class="item">Clear</button>
 
     <div class="container">
         <table id="prod_table">
@@ -128,6 +187,15 @@
         </table>
     </div>
     <script src="client.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
     <script async defer src="https://apis.google.com/js/api.js" onload="this.onload=function(){};handleClientLoad()"
         onreadystatechange="if (this.readyState === 'complete') this.onload()">
         </script>
