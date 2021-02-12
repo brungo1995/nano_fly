@@ -6,6 +6,8 @@
     <title>Google drive API</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 </head>
 
 <body>
@@ -69,50 +71,69 @@
                 <!-- Display Content -->
                 <section class="row mt-5" id="file_detail_section">
                     <div class="col">
-                        <h3>File Data </h3>
+                        <h3>File Data</h3>
+                        <div class="row mb-5">
+                            <input class=" ml-3" type="text" placeholder="Product name" id="product_name">
+                            <label class="m-2">Purchased?: </label>
+                            <label class="m-2">Yes</label>
+                            <input type="radio" name="purchased" id="purchased" style="margin-top: 15px ">
+                            <span class="checkmark"></span>
+                            <label class="m-2">No</label>
+                            <input type="radio" name="purchased" id="not_purchased" style="margin-top: 15px ">
+                            <span class="checkmark"></span>
+
+                            <button type="button" class="btn btn-outline-secondary ml-3 btn-sm"
+                                id="share_file_with_user" onclick="handleAppendNewRow()">Add Row</button>
+
+                        </div>
+
                         <table class="table table-striped" style="width: fit-content" id="file_detail_table">
-
-                        </table>
-                        <!-- <table class="table " style="width: fit-content">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Product name</th>
-                                    <th scope="col">Purchased?</th>
-                                    <th scope="col">Purchased?</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th scope="row">
-                                        <input type="text" class="form-control" placeholder="Id, name to search/create">
-                                    </th>
-                                    <td>
-                                        <div class="row"><input type="text" class="form-control"
-                                                placeholder="Id, name to search/create"></div>
-                                    </td>
-                                    <td><input type="text" class="form-control" placeholder="Id, name to search/create">
-                                    </td>
-                                    <td>
-                                        <div class="row">
-                                            <button type="button" class="btn btn-light ">Remove row</button>
-                                            <button type="button" class="btn btn-light ">Save change</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table> -->
-
                     </div>
-                </section>
+
+                    </table>
+
+
             </div>
-        </main>
-
-        <!-- <button id="list_files" class="item">List all Files</button> -->
 
 
-        <!-- Folders -->
-        <!-- <div class="form_col">
+
+            </section>
+
+
+            <!-- Shared with Section -->
+            <section class="row mt-5" id="share_file_section">
+                <div class=" col">
+                    <div class="row">
+                        <h3>Share File </h3>
+                        <!-- <i class="fa fa-plus fa-2x ml-5" aria-hidden="true"></i> -->
+                    </div>
+                    <div class="row mt-3 mb-3" id="share_file_input_section">
+                        <input class=" ml-3" type="email" placeholder="user@gmail.com" id="user_email">
+                        <select name="roles" id="roles" class=" ml-3">
+                            <option value="owner" selected>Owner</option>
+                            <option value="writer">Writer</option>
+                            <option value="reader">Reader</option>
+                        </select>
+                        <button type="button" class="btn btn-outline-secondary ml-3" id="share_file_with_user"
+                            onclick="handleShareFile()">Share File</button>
+                    </div>
+
+                    <table class="table table-striped" style="width: fit-content" id="share_file__table">
+
+                    </table>
+
+                </div>
+
+            </section>
+
+    </div>
+    </main>
+
+    <!-- <button id="list_files" class="item">List all Files</button> -->
+
+
+    <!-- Folders -->
+    <!-- <div class="form_col">
             <h3 for="">Folders</h3>
             <label for="folder_name"></label>
             <input type="text" name="folder_name" id="folder_name" placeholder="Folder name">
@@ -121,8 +142,8 @@
             <button id="delete_folder" class="item">Delete</button>
         </div> -->
 
-        <!-- Sheets -->
-        <!-- <div class="form_col">
+    <!-- Sheets -->
+    <!-- <div class="form_col">
             <h3 for="">Spreadsheets</h3>
             <label for="spreadsheet_name"></label>
             <input type="text" class="item" name="spreadsheet_name" id="spreadsheet_name"
@@ -158,34 +179,11 @@
 
 
 
-        <pre id="content" style="white-space: pre-wrap;"></pre>
-        <!-- <button id="clear" class="item">Clear</button> -->
+    <pre id="content" style="white-space: pre-wrap;"></pre>
+    <!-- <button id="clear" class="item">Clear</button> -->
     </div>
 
-    <div class="container">
-        <table id="prod_table">
-            <!-- <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Points</th>
-            </tr>
-            <tr>
-                <td>Jill</td>
-                <td>Smith</td>
-                <td>50</td>
-            </tr>
-            <tr>
-                <td>Eve</td>
-                <td>Jackson</td>
-                <td>94</td>
-            </tr>
-            <tr>
-                <td>Adam</td>
-                <td>Johnson</td>
-                <td>67</td>
-            </tr> -->
-        </table>
-    </div>
+
     <script src="client.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"

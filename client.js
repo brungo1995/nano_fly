@@ -10,7 +10,6 @@ var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/res
 // Authorization scopes required by the API; multiple scopes can be
 // var SCOPES = 'https://www.googleapis.com/auth/drive.file';
 var SCOPES = 'https://www.googleapis.com/auth/drive';
-// var SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly';
 
 
 var authorizeButton = document.getElementById('authorize_button');
@@ -35,7 +34,8 @@ var createSheetButton = document.getElementById('create_sheet');
 // var updateFileButton = document.getElementById('update');
 // var deleteLastRowFileButton = document.getElementById('delete_last_row');
 
-
+let fileId = "";
+const alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 
 /**
  *  On load, called to load the auth2 library and API client library.
@@ -124,6 +124,7 @@ function updateSigninStatus(isSignedIn) {
         // Tables
         document.getElementById("list_files_section").style.display = 'none';
         document.getElementById("file_detail_section").style.display = 'none';
+        document.getElementById("share_file_section").style.display = 'none';
 
 
 
@@ -158,6 +159,7 @@ function updateSigninStatus(isSignedIn) {
         // Tables
         document.getElementById("list_files_section").style.display = 'none';
         document.getElementById("file_detail_section").style.display = 'none';
+        document.getElementById("share_file_section").style.display = 'none';
 
     }
 }
@@ -277,13 +279,13 @@ function buildListTableBody(files) {
     files.forEach((file, index) => {
         const { name, type, id, mimeType } = file
         content += `<tr>`;
-        content += `<th scope="row">${index}</th>`;
+        content += `<th scope="row">${index + 1}</th>`;
         content += `<td>${name}</td>`;
         content += `<td>${id}</td>`;
         content += `<td>${type}</td>`;
         content += `<td style="padding-top: 6px;">`;
         content += `<div class="row" style="flex-wrap: nowrap">`;
-        content += `<button type="button" class="btn btn-light btn-sm">Shared with</button>`;
+        content += `<button type="button" class="btn btn-light btn-sm" onclick="handlePeopleWhoShare('${id}')">Shared with</button>`;
         content += `<button type="button" class="btn btn-light btn-sm ml-2" onclick="getFile('${id}', '${mimeType}')">Display</button>`;
         content += `<button type="button" class="btn btn-light btn-sm ml-2 mr-2" onclick="deleteFile('${id}', '${mimeType}')">Delete file</button>`;
         content += ` </div>`;
@@ -454,6 +456,7 @@ function deleteFile(id, mimeType) {
  * Display Sheet data
  */
 function handleGetSheetData(id) {
+    fileId = id;
 
     gapi.client
         .request({
@@ -461,10 +464,18 @@ function handleGetSheetData(id) {
         })
         .then(function (response) {
             console.log(response);
+
             let sheetValues = response.result.sheets[0].data[0].rowData.map(
                 (row, rowIndex) =>
-                    row.values.map((column, columnIndex) => column.formattedValue)
+                    (row.values || []).map((column, columnIndex) => column.formattedValue)
             );
+            // let sheetValues = response.result.sheets[0].data[0].rowData.map(
+            //     (row, rowIndex) =>
+            //         row.values.map((column, columnIndex) => column.formattedValue)
+            // );
+
+            // this sheetId must go inside the loop to extra the data otherwhite you can read sheet id from difference  pages
+            let sheetId = response.result.sheets[0].properties.sheetId
             const headings = sheetValues.shift();
             console.log(headings);
 
@@ -483,7 +494,7 @@ function handleGetSheetData(id) {
                 data: data
             }
 
-            displaySheetValues(obj)
+            displaySheetValues(obj, id, sheetId)
 
             // console.log(data)
 
@@ -494,14 +505,14 @@ function handleGetSheetData(id) {
 }
 
 
-function displaySheetValues(data) {
+function displaySheetValues(data, id, sheetId) {
     let content = ``;
-    content += buildTableHeadForSheet(data.headings);
-    content += buildTableBodySheet(data.data)
+    content += buildSheetTableHead(data.headings);
+    content += buildSheetTableBody(data.data, id, sheetId)
     buildSheetTable(content)
 }
 
-function buildTableHeadForSheet(headings) {
+function buildSheetTableHead(headings) {
     let content = ``;
     content += ` <thead class="thead-dark">`;
     content += `<tr>`;
@@ -515,27 +526,30 @@ function buildTableHeadForSheet(headings) {
     return content;
 }
 
-function buildTableBodySheet(data) {
+function buildSheetTableBody(data, id, sheetId) {
+
     let content = ``;
     content += ` <tbody>`;
 
-    (data || []).forEach((row, index) => {
+    (data || []).forEach((row, rowIndex) => {
         content += `<tr>`;
 
-        content += `<td>${index + 1}</td>`;
-
+        content += `<td>${rowIndex + 1}</td>`;
+        let ids = []
         for (var key of Object.keys(row)) {
+            ids.push(`${key}_${rowIndex + 1}`);
             content += `<td>
-                        <input type="text" class="form-control" value="${row[key]}">
+                        <input type="text" class="form-control" value="${row[key]}" id="${key}_${rowIndex + 1}">
                     </td>`;
         }
 
-        // content += `<td style="padding-top: 6px;">`;
         content += `<td >`;
         content += `<div class="row" style="flex-wrap: nowrap">`;
-        // content += `<button type="button" class="btn btn-light mr-2">Edit Share</button>`;
-        content += `<button type="button" class="btn btn-light mr-2">Save change</button>`;
-        content += `<button type="button" class="btn btn-light  mr-2">Remove Row</button>`;
+
+
+        content += `<button type="button" class="btn btn-light mr-2" onclick="handleUpdateRow('${id}', '${sheetId}', '${rowIndex + 1}','${rowIndex + 2}' ,'${ids}')">Save change</button>`;
+
+        content += `<button type="button" class="btn btn-light  mr-2" onclick="handleDeleteRow('${rowIndex + 1}', '${sheetId}', '${id}')">Remove Row</button>`;
         content += ` </div>`;
         content += `</td>`;
 
@@ -613,143 +627,291 @@ function handleCreateSpreadsheet() {
     });
 }
 
+
+
 /** APPEND ROW */
 function handleAppendNewRow() {
-    let docId = document.getElementById("spreadsheet_name").value
-    // let sheetName = document.getElementById("sheet_name").value
     let isPurchased = document.getElementById("purchased").checked
-    let productName = document.getElementById("product_name").value
+    let productName = document.getElementById("product_name").value;
 
-
-    // POST https://sheets.googleapis.com/v4/spreadsheets/spreadsheetId/values/Sheet1!A1:E1:append?valueInputOption=USER_ENTERED
     gapi.client
         .request({
-            // path: `https://sheets.googleapis.com/v4/spreadsheets/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U/values/Products!A1:B1:append?valueInputOption=USER_ENTERED`,
-            path: `https://sheets.googleapis.com/v4/spreadsheets/${docId}/values/Products!A1:B1:append?valueInputOption=USER_ENTERED`,
+            path: `https://sheets.googleapis.com/v4/spreadsheets/${fileId}/values/Products!A1:B1:append?valueInputOption=USER_ENTERED`,
             method: "post",
             body: {
-                // values: [["Tuna", false]],
                 values: [[productName, isPurchased]],
             },
         })
         .then(function (response) {
-            appendPre(`Appended data Successfully`);
-            handleGetSpreadsheet();
-            // console.log(response);
-            // reRenderTable2();
+            console.log("Created Row");
+            console.log(response);
+            handleGetSheetData(fileId)
         })
-        .catch((error) => {
-            appendPre(`Cannot append data to sheet`);
-        });
+
 }
 
 /** SHARE SHEET */
 function handleShareFile() {
-    let docId = document.getElementById("spreadsheet_name").value;
+    let email = document.getElementById("user_email").value
+    let role = document.getElementById("roles").value
     gapi.client
         .request({
-            // path: `https://www.googleapis.com/drive/v3/files/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U/permissions?emailMessage='Hey Jason did you get the invitation'`,
-            path: `https://www.googleapis.com/drive/v3/files/${docId}/permissions?emailMessage='Hey Jason did you get the invitation'`,
+            path: `https://www.googleapis.com/drive/v3/files/${fileId}/permissions?emailMessage='Hey please accept my invitation to colaborate'`,
             method: "post",
             body: {
-                role: "writer",
+                role: role,
                 type: "user",
-                // emailAddress: "jason@nanosoft.co.za",
-                emailAddress: "brungo1995@gmail.com",
+                emailAddress: email,
             },
         })
         .then((response) => {
-            console.log("Shared filed")
+            console.log("Shared filed with " + email)
             console.log(response);
+            handlePeopleWhoShare(fileId)
         });
 }
 
 
 /** UNSHARE FILE */
-function handleUnshare() {
-    let docId = document.getElementById("spreadsheet_name").value;
-
+function handleUnshare(permissionId, fileId) {
     gapi.client
         .request({
-            path: `https://www.googleapis.com/drive/v3/files/${docId}/permissions/06295840178656814372`,
-            // path: `https://www.googleapis.com/drive/v3/files/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U/permissions/13934111265224148781`,
+            path: `https://www.googleapis.com/drive/v3/files/${fileId}/permissions/${permissionId}`,
             method: "delete",
         })
         .then((response) => {
+            console.log("Removed share")
             console.log(response);
+            handlePeopleWhoShare(fileId)
+        });
+}
+
+/** UPDATE SHARE SHEET */
+function handleUpdateShareFile(permissionId) {
+    let role = document.getElementById(`role_${permissionId}`).value
+    const path = `https://www.googleapis.com/drive/v3/files/${fileId}/permissions/${permissionId}?transferOwnership=${role === 'owner' ? true : false}`;
+    console.log(path)
+    gapi.client
+        .request({
+            path: path,
+            method: "PATCH",
+            body: {
+                role: role,
+            },
+        })
+        .then((response) => {
+            // console.log("Shared filed with " + email)
+            console.log(response);
+            handlePeopleWhoShare(fileId)
         });
 }
 
 
 /**HANDLE PEOPLE LIST OF SHARED PEOPLE */
-function handlePeopleWhoShare() {
-    let docId = document.getElementById("spreadsheet_name").value;
+function handlePeopleWhoShare(id) {
+    fileId = id;
     gapi.client
         .request({
-            // path: `https://www.googleapis.com/drive/v3/files/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U?fields=*`,
-            path: `https://www.googleapis.com/drive/v3/files/${docId}?fields=*`,
-        })
-        .then(function (response) {
-            console.log(response)
-            handleClear();
-            (response.result.permissions || []).forEach(permission => {
-                appendPre(`Name: ${permission.displayName} PermissionId: ${permission.id}`)
-            })
-            // console.log(response.result.permissions.map((perm) => perm.displayName));
-        });
-}
-
-
-
-/**UPDATE ROW */
-function handleUpdateRow() {
-    let docId = document.getElementById("spreadsheet_name").value
-    // let sheetName = document.getElementById("sheet_name").value
-    let isPurchased = document.getElementById("purchased").checked
-    let productName = document.getElementById("product_name").value
-
-    gapi.client
-        .request({
-            path: `https://sheets.googleapis.com/v4/spreadsheets/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U/values/Products!A5:B5?valueInputOption=USER_ENTERED`,
-            method: "put",
-            body: {
-                // "range": "Products!A4:B4",
-                values: [["Rice", true]],
-                // range: "A5:B5",
-                // values: [[productName, isPurchased]],
-            },
+            path: `https://www.googleapis.com/drive/v3/files/${id}?fields=*`,
         })
         .then(function (response) {
             console.log(response);
-            // appendPre(`Appended data Successfully`);
-            handleGetSpreadsheet();
-        })
-        .catch((error) => {
-            appendPre(`Cannot append data to sheet`);
+            let content = ``;
+            content += buildTableHeadShareFile();
+            content += buildTableBodyShareFile(response.result.permissions, id)
+            buildShareFileTable(content)
         });
 }
 
-/**DELETE ROW */
-function handleDeleteRow() {
-    let docId = document.getElementById("spreadsheet_name").value
-    let isPurchased = document.getElementById("purchased").checked
-    let productName = document.getElementById("product_name").value
+function buildTableHeadShareFile() {
+    let content = ``;
+    content += ` <thead class="thead-dark">`;
+    content += `<tr>`;
+    content += `<th scope="col">#</th>`;
+    content += ` <th scope="col">Name</th>`;
+    content += ` <th scope="col">Email</th>`;
+    content += ` <th scope="col">Type</th>`;
+    content += ` <th scope="col">Role</th>`;
+    content += `<th scope="col">Actions</th>`;
+    content += `</tr>`;
+    content += `</thead>`;
+    return content;
+}
+
+function buildTableBodyShareFile(data, fileId) {
+    let content = ``;
+    content += ` <tbody>`;
+
+    (data || []).forEach((permission, index) => {
+        const { displayName, emailAddress, role, type, id } = permission;
+
+        content += `<tr>`;
+
+        content += `<td>${index + 1}</td>`;
+        content += `<td>${displayName}</td>`;
+        content += `<td>${emailAddress}</td>`;
+        content += `<td>${type}</td>`;
+
+        if (role === 'owner') {
+            content += `<td>Owner</td>`;
+        } else {
+            content += `<td>
+            <select name="cars" id="role_${id}" onchange="handleChangeRole('${id}', this)">
+                <option value="owner" ${role === "owner" ? "selected" : ""}>Owner</option>
+                <option value="writer" ${role === "writer" ? "selected" : ""}>Writer</option>
+                <option value="reader" ${role === "reader" ? "selected" : ""}>Reader</option>
+            </select>            
+        </td>`;
+        }
+
+
+        content += `<td style="padding-top: 6px;">`;
+        content += `<div class="row" style="flex-wrap: nowrap">`;
+        content += `<button type="button" class="btn btn-light btn-sm" onclick="handleUpdateShareFile('${id}'
+        )" >Update</button>`;
+        content += `<button type="button" class="btn btn-light btn-sm ml-2 mr-2" onclick="handleUnshare('${id}', '${fileId}')">Unshare</button>`;
+        content += ` </div>`;
+        content += `</td>`;
+
+        content += `</tr>`;
+    });
+
+    content += ` </tbody>`;
+
+    return content
+}
+
+function handleChangeRole(permissionId, role) {
+    // console.log(" Changing")
+    // console.log(permissionId, role)
+}
+
+
+function buildShareFileTable(content) {
+    document.getElementById("share_file_section").style.display = 'flex';
+    let table = document.getElementById("share_file__table");
+    table.innerHTML = content;
+}
+
+
+/**UPDATE ROW */
+function handleUpdateRow(fileId, sheetId, startRowIndex, endRowIndex, inputIds) {
+    inputIds = inputIds.split(",");
+    let values = (inputIds || []).map(inputId => {
+        let value = document.getElementById(inputId).value;
+        return {
+            "userEnteredValue": {
+                "stringValue": value
+            }
+        }
+    })
 
     gapi.client
         .request({
-            // POST https://sheets.googleapis.com/v4/spreadsheets/spreadsheetId:batchUpdate
-            path: `https://sheets.googleapis.com/v4/spreadsheets/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U:batchUpdate`,
+            path: `https://sheets.googleapis.com/v4/spreadsheets/${fileId}:batchUpdate`,
+            method: "post",
+            body: {
+                "requests": [
+                    {
+                        "updateCells": {
+                            "range": {
+                                "sheetId": sheetId,
+                                "startRowIndex": startRowIndex,
+                                "endRowIndex": endRowIndex
+                            },
+                            "rows": [
+                                {
+                                    "values": values
+                                }
+                            ],
+                            "fields": "*"
+                        }
+                    }
+                ]
+            }
+
+        })
+        .then(function (response) {
+            console.log("UPDATED ROW")
+            console.log(response);
+            handleGetSheetData(fileId);
+        })
+
+
+    // let docId = document.getElementById("spreadsheet_name").value
+    // // let sheetName = document.getElementById("sheet_name").value
+    // let isPurchased = document.getElementById("purchased").checked
+    // let productName = document.getElementById("product_name").value
+
+    // gapi.client
+    //     .request({
+    //         path: `https://sheets.googleapis.com/v4/spreadsheets/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U/values/Products!A5:B5?valueInputOption=USER_ENTERED`,
+    //         method: "put",
+    //         body: {
+    //             // "range": "Products!A4:B4",
+    //             values: [["Rice", true]],
+    //             // range: "A5:B5",
+    //             // values: [[productName, isPurchased]],
+    //         },
+    //     })
+    //     .then(function (response) {
+    //         console.log(response);
+    //         // appendPre(`Appended data Successfully`);
+    //         handleGetSpreadsheet();
+    //     })
+    //     .catch((error) => {
+    //         appendPre(`Cannot append data to sheet`);
+    //     });
+}
+
+
+// body: {
+//     "requests": [
+//       {
+//         "updateCells": {
+//           "range": {
+//             "sheetId": 1837341742,
+//             "startRowIndex": 2,
+//             "endRowIndex": 3
+//           },
+//           "rows": [
+//             {
+//               "values": [
+//                 {
+//                   "userEnteredValue": {
+//                     "stringValue": "Bread"
+//                   }
+//                 },
+//                 {
+//                   "userEnteredValue": {
+//                     "boolValue": true
+//                   }
+//                 }
+//               ]
+//             }
+//           ],
+//           "fields": "*"
+//         }
+//       }
+//     ]
+//   }
+
+/**DELETE ROW */
+function handleDeleteRow(rowIndexStart, sheetId, fileId) {
+
+    gapi.client
+        .request({
+            path: `https://sheets.googleapis.com/v4/spreadsheets/${fileId}:batchUpdate`,
             method: "post",
             body: {
                 "requests": [
                     {
                         "deleteDimension": {
                             "range": {
-                                // A sheet's sheetId can be retrieved using the spreadsheet.get method.
-                                "sheetId": 1837341742,
+                                "sheetId": sheetId,
                                 "dimension": "ROWS",
-                                "startIndex": 3,
-                                "endIndex": 4
+                                "startIndex": rowIndexStart,
+                                "endIndex": rowIndexStart + 1
                             }
                         }
                     }
@@ -759,12 +921,9 @@ function handleDeleteRow() {
         .then(function (response) {
             console.log("DELETED ROW")
             console.log(response);
-            // appendPre(`Appended data Successfully`);
-            handleGetSheetData();
+            handleGetSheetData(fileId);
         })
-        .catch((error) => {
-            appendPre(`Cannot delete row`);
-        });
+
 }
 
 
