@@ -1,5 +1,4 @@
 
-// nanosoft Account
 var CLIENT_ID = '268533544506-b9ebe7rme4t6c99jbksi03gb3fc5iu7h.apps.googleusercontent.com';
 var API_KEY = 'AIzaSyBbwCP7WsVophZAYHOH2oVw3pqUY9Xzklw';
 
@@ -17,25 +16,15 @@ var signoutButton = document.getElementById('signout_button');
 
 // Folders
 var listFoldersButton = document.getElementById('list_folders');
-// var clearButton = document.getElementById('clear');
 var createFolderButton = document.getElementById('create_folder');
-// var deleteFolderButton = document.getElementById('delete_folder');
 
 //Files
 var listSpreadsheetsFilesButton = document.getElementById('list_spread_files');
 var listFilesButton = document.getElementById('list_files');
-// var getFileButton = document.getElementById('get_file');
 var createSheetButton = document.getElementById('create_sheet');
-// var deleteSpreadsheetsFilesButton = document.getElementById('delete_spread_file');
-// var appendDataToFileButton = document.getElementById('append_data');
-// var shareFileButton = document.getElementById('share');
-// var unshareFileButton = document.getElementById('unshare');
-// var peopleWhoShareFileButton = document.getElementById('people_who_share');
-// var updateFileButton = document.getElementById('update');
-// var deleteLastRowFileButton = document.getElementById('delete_last_row');
+
 
 let fileId = "";
-const alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 
 /**
  *  On load, called to load the auth2 library and API client library.
@@ -67,23 +56,13 @@ function initClient() {
 
         // // Register folder handlers
         listFoldersButton.onclick = handleListFolders;
-        // clearButton.onclick = handleClear;
         createFolderButton.onclick = handleCreateFolder;
-        // deleteFolderButton.onclick = handleDeleteFolder;
 
         // // File handlers
-        createSheetButton.onclick = handleCreateSpreadsheet;
-        // getFileButton.onclick = handleGetSheetData;
-        // // getFileButton.onclick = handleGetSpreadsheet;
+        createSheetButton.onclick = handleCreateSpreadsheetInsideFolder;
         listSpreadsheetsFilesButton.onclick = handleListSpreadFiles;
-        // deleteSpreadsheetsFilesButton.onclick = handleDeleteSpreadFile;
-        // appendDataToFileButton.onclick = handleAppendNewRow;
-        // shareFileButton.onclick = handleShareFile;
-        // unshareFileButton.onclick = handleUnshare;
-        // peopleWhoShareFileButton.onclick = handlePeopleWhoShare;
-        // updateFileButton.onclick = handleUpdateRow;
-        // deleteLastRowFileButton.onclick = handleDeleteRow;
 
+        populateFolderSelect()
     }, function (error) {
         appendPre(JSON.stringify(error, null, 2));
     });
@@ -180,16 +159,46 @@ function handleSignoutClick(event) {
     gapi.auth2.getAuthInstance().signOut();
 }
 
-/**
- * Append a pre element to the body containing the given message
- * as its text node. Used to display the results of the API call.
- *
- * @param {string} message Text to be placed in pre element.
- */
-function appendPre(message) {
-    var pre = document.getElementById('content');
-    var textContent = document.createTextNode(message + '\n');
-    pre.appendChild(textContent);
+function populateFolderSelect() {
+    gapi.client.request({
+        path: "https://www.googleapis.com/drive/v3/files?q=mimeType: 'application/vnd.google-apps.folder'",
+    }).then(function (response) {
+        let files = response.result.files;
+        console.log("Folders result")
+        console.log(response)
+
+        let content = ``;
+        content += buildListFilesTableHead()
+
+        if (files && files.length <= 0) {
+            content += ``;
+        } else {
+
+            files = (response.result.files || []).map((file => {
+                const { id, name, mimeType } = file;
+                let obj = {};
+                obj['id'] = id;
+                obj['name'] = name;
+                obj['mimeType'] = mimeType;
+                obj['type'] = "🗂️"
+                return obj
+            }));
+
+            buildFolderSelectOptions(files);
+        }
+    });
+}
+
+
+function buildFolderSelectOptions(files) {
+    let content = ``;
+    content += `<option value="">Select Folder to create file in</option>`;
+    (files || []).forEach(file => {
+        content += `<option value="${file.id}">${file.name}</option>`
+    });
+
+    let folderSelect = document.getElementById("folder_names");
+    folderSelect.innerHTML = content;
 }
 
 function handleClear() {
@@ -255,8 +264,6 @@ function handleCreateFolder() {
         handleListFolders()
     });
 }
-
-
 
 
 function buildListFilesTableHead() {
@@ -465,14 +472,10 @@ function handleGetSheetData(id) {
         .then(function (response) {
             console.log(response);
 
-            let sheetValues = response.result.sheets[0].data[0].rowData.map(
+            let sheetValues = (response.result.sheets[0].data[0].rowData || []).map(
                 (row, rowIndex) =>
                     (row.values || []).map((column, columnIndex) => column.formattedValue)
             );
-            // let sheetValues = response.result.sheets[0].data[0].rowData.map(
-            //     (row, rowIndex) =>
-            //         row.values.map((column, columnIndex) => column.formattedValue)
-            // );
 
             // this sheetId must go inside the loop to extra the data otherwhite you can read sheet id from difference  pages
             let sheetId = response.result.sheets[0].properties.sheetId
@@ -507,8 +510,13 @@ function handleGetSheetData(id) {
 
 function displaySheetValues(data, id, sheetId) {
     let content = ``;
-    content += buildSheetTableHead(data.headings);
-    content += buildSheetTableBody(data.data, id, sheetId)
+    if (!data.headings || data.headings.length <= 0) {
+        content += `<h3>No Data found</h3>`
+    } else {
+        content += buildSheetTableHead(data.headings);
+        content += buildSheetTableBody(data.data, id, sheetId)
+
+    }
     buildSheetTable(content)
 }
 
@@ -572,13 +580,102 @@ function buildSheetTable(content) {
 /**
  * CREATE SPREADSHEET
  */
-function handleCreateSpreadsheet() {
+function handleCreateSpreadsheetInsideFolder() {
+    const docName = document.getElementById("resource_name").value;
+    let folderId = document.getElementById("folder_names").value;
+
+    if (!folderId || folderId === "" || !docName || docName === "") {
+        return
+    }
+
+    gapi.client.request({
+        path: "https://www.googleapis.com/drive/v3/files",
+        method: "post",
+        body: {
+            parents: ["1dbdEe_502FizNHlH2N6yygoePi67WsBC"],
+            name: `${docName || "Shopping List by you"}`,
+            mimeType: "application/vnd.google-apps.spreadsheet",
+        }
+    }).then(function (response) {
+        console.log("Created File Inside folder");
+        console.log(response);
+        const { id, name } = response.result
+        let obj = {};
+        obj.id = id
+        obj.name = name;
+
+        return obj
+        // handleListSpreadFiles()
+    }).then(result => {
+        // cal create sheet
+        handleCreateSheet(result)
+    }).catch(error => {
+        console.log("Failde to create file")
+        console.log(error)
+    });
+
+}
+
+
+function handleCreateSheet(createdSpreadsheetFileRes) {
+    const docName = document.getElementById("resource_name").value
+    const { id, name } = createdSpreadsheetFileRes;
+
+
+    gapi.client
+        .request({
+            path: `https://sheets.googleapis.com/v4/spreadsheets/${id}:batchUpdate`,
+            method: "post",
+            body: {
+                "requests": [
+                    {
+                        "updateCells": {
+                            "range": {
+                                "sheetId": 0,
+                                "startRowIndex": 0,
+                                "endRowIndex": 1
+                            },
+                            "rows": [
+                                {
+                                    values: [
+                                        {
+                                            userEnteredValue: {
+                                                stringValue: "Product Name"
+                                            }
+
+                                        },
+                                        {
+                                            userEnteredValue: {
+                                                stringValue: "Purchased"
+                                            }
+
+                                        },
+                                    ]
+                                }
+                            ],
+                            "fields": "*"
+                        }
+                    }
+                ]
+            }
+
+        }).then(function (response) {
+            console.log("Created Sheet");
+            console.log(response);
+            handleListSpreadFiles()
+
+        });
+
+}
+
+function handleCreateSpreadsheetCopy() {
     const docName = document.getElementById("resource_name").value
 
     gapi.client.request({
         path: "https://sheets.googleapis.com/v4/spreadsheets",
         method: "post",
         body: {
+            // 1dbdEe_502FizNHlH2N6yygoePi67WsBC
             properties:
             {
                 title: `${docName || "Shopping List by you"}`
@@ -626,8 +723,6 @@ function handleCreateSpreadsheet() {
 
     });
 }
-
-
 
 /** APPEND ROW */
 function handleAppendNewRow() {
@@ -799,12 +894,15 @@ function handleUpdateRow(fileId, sheetId, startRowIndex, endRowIndex, inputIds) 
     inputIds = inputIds.split(",");
     let values = (inputIds || []).map(inputId => {
         let value = document.getElementById(inputId).value;
+        // can be better improved by instead of just receive an array from th click event, receive an obect
+        // with the type of the property too, to use other user values not only stringValue, boolean as well
+        // numbers
         return {
             "userEnteredValue": {
                 "stringValue": value
             }
         }
-    })
+    });
 
     gapi.client
         .request({
@@ -836,65 +934,9 @@ function handleUpdateRow(fileId, sheetId, startRowIndex, endRowIndex, inputIds) 
             console.log(response);
             handleGetSheetData(fileId);
         })
-
-
-    // let docId = document.getElementById("spreadsheet_name").value
-    // // let sheetName = document.getElementById("sheet_name").value
-    // let isPurchased = document.getElementById("purchased").checked
-    // let productName = document.getElementById("product_name").value
-
-    // gapi.client
-    //     .request({
-    //         path: `https://sheets.googleapis.com/v4/spreadsheets/1wQBMLcxyyIX8H6zTKPGf2F5jzVkdmkvZoAS4yVOMm3U/values/Products!A5:B5?valueInputOption=USER_ENTERED`,
-    //         method: "put",
-    //         body: {
-    //             // "range": "Products!A4:B4",
-    //             values: [["Rice", true]],
-    //             // range: "A5:B5",
-    //             // values: [[productName, isPurchased]],
-    //         },
-    //     })
-    //     .then(function (response) {
-    //         console.log(response);
-    //         // appendPre(`Appended data Successfully`);
-    //         handleGetSpreadsheet();
-    //     })
-    //     .catch((error) => {
-    //         appendPre(`Cannot append data to sheet`);
-    //     });
 }
 
 
-// body: {
-//     "requests": [
-//       {
-//         "updateCells": {
-//           "range": {
-//             "sheetId": 1837341742,
-//             "startRowIndex": 2,
-//             "endRowIndex": 3
-//           },
-//           "rows": [
-//             {
-//               "values": [
-//                 {
-//                   "userEnteredValue": {
-//                     "stringValue": "Bread"
-//                   }
-//                 },
-//                 {
-//                   "userEnteredValue": {
-//                     "boolValue": true
-//                   }
-//                 }
-//               ]
-//             }
-//           ],
-//           "fields": "*"
-//         }
-//       }
-//     ]
-//   }
 
 /**DELETE ROW */
 function handleDeleteRow(rowIndexStart, sheetId, fileId) {
@@ -962,16 +1004,6 @@ function handleListSpreadFiles() {
 
         buildListTable(content)
 
-
-        // var files = response.result.files;
-        // if (files && files.length > 0) {
-        //     for (var i = 0; i < files.length; i++) {
-        //         var file = files[i];
-        //         appendPre(file.name + ' (' + file.id + ')');
-        //     }
-        // } else {
-        //     appendPre('No Spreadsheets found.');
-        // }
     });
 
 }
